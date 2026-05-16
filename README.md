@@ -6,7 +6,7 @@ Before building the project, make sure you have the following insatlled:
 - CMake (Latest release)
 - Project Chrono (7.0.3)
 
-## Useful links
+## Installation links
 
 CMake: https://cmake.org/download/
 Project Chrono: https://github.com/projectchrono/chrono/releases
