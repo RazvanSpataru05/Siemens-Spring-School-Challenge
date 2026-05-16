@@ -1,12 +1,80 @@
-# SpringSchool - ProjectChrono - GeneticAlgorithm
+## Requirements
 
-1. Create a folder named <b>"build"</b> inside the ChronoProject_GeneticAlgorithm folder.
+Before building the project, make sure you have the following insatlled:
 
-2. Use CMake in order to build the application:
-    - "Where is the source" -> select the path to the ChronoProject_GeneticAlgorithm folder (".../ChronoProject_GeneticAlgorithm")
-    - "Where to build the binaries" -> select the path to the build folder created inside the ChronoProject_GeneticAlgorithm folder (".../ChronoProject_GeneticAlgorithm/build")
-    - If Chrono_DIR was not found, edit the value of Chrono_DIR to .../chrono-build/cmake
+- Visual Studio (2022 or later)
+- CMake (Latest release)
+- Project Chrono (7.0.3)
 
-3. Open <b>ChronoProject_GeneticAlgorithm.sln</b> (CMake will generate it).
-4. In the Solution Explorer in Visual Studio, right click on ChronoProject_GeneticAlgorithm and then click on <b>"Set as Startup Project"</b>.
-5. Build and compile the project. If some dll's are not found you need to copy them manually. You’ll find all of them in …/StructuralOptimizationUsingGA/chrono-build/bin, in Release and Debug directories. Just copy them in your project, in the corresponding Debug or Release folder.
+## Useful links
+
+CMake: https://cmake.org/download/
+Project Chrono: https://github.com/projectchrono/chrono/releases
+
+### 1. Create the build folder
+
+Inside the `ChronoProject_GeneticAlgorithm` directory, create a folder named:
+
+```text
+build
+```
+
+### 2. Configure the Project with CMake
+
+Open CMake and set:
+
+#### Where is the source code
+
+Select:
+
+```text
+.../ChronoProject_GeneticAlgorithm
+```
+
+#### Where to build the binaries
+
+Select:
+
+```text
+.../ChronoProject_GeneticAlgorithm/build
+```
+
+### 3. Configure Chrono_DIR
+
+If `Chrono_DIR` is not automatically detected, set it manually to:
+
+```text
+.../chrono-build/cmake
+```
+
+### 4. Generate the Visual Studio Solution
+
+Press **Configure** and then **Generate**.
+
+CMake will generate:
+
+```text
+ChronoProject_GeneticAlgorithm.sln
+```
+
+### 5. Open & Run the Solution
+
+Open the generated 'sln' file in Visual Studio.
+
+In Solution Explorer:
+- Set the project to run on the Release version
+- Right-click on 'ChronoProject_FinalGA'
+- Select ***Select as startup project***
+
+### 6. Run the project
+Compile and run the solution (Press 'F5')
+
+### DLL Troubleshooting
+
+If some DLLs do not get copied correctly, do the following:
+
+- Right-click the solution file and select 'Properties'
+- Select 'Project Dependencies'
+- On the 'Projects' tab, press ***ALL_BUILD*** and select ***ChronoProject_FinalGA***
+- Tick the 'COPY_DLLS' checkbox
+- Press 'Apply' then 'OK'
