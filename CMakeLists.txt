@@ -8,7 +8,7 @@
 # 
 #--------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 #--------------------------------------------------------------
 # === 1 === 
@@ -239,9 +239,9 @@ file(COPY
     ${CHRONO_DEBUG_PATH}/ChronoEngine_irrlicht.dll
     DESTINATION ${DEBUG_PATH})
 	
-file(COPY
-    ${CHRONO_DEBUG_PATH}/ChronoEngine_postprocess.dll
-    DESTINATION ${DEBUG_PATH})
+#file(COPY
+#    ${CHRONO_DEBUG_PATH}/ChronoEngine_postprocess.dll
+#    DESTINATION ${DEBUG_PATH})
 	
 file(COPY
     ${CHRONO_DEBUG_PATH}/Irrlicht.dll

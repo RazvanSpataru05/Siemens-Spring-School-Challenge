@@ -51,6 +51,10 @@ private:
 	double SimulateAndGetMaximStress();
 	bool IsOnTopLayer(size_t possition);
 
+	void Crossover3DBlock(IIndividual& other);
+	void Crossover2PointPlanar(IIndividual& other);
+	void CrossoverSymmetryForced(IIndividual& other);
+
 private:
 	std::shared_ptr<Building> m_building;
 
