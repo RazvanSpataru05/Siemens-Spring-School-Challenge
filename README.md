@@ -1,6 +1,6 @@
 ## Requirements
 
-Before building the project, make sure you have the following insatlled:
+Before building the project, make sure you have the following installed:
 
 - Visual Studio (2022 or later)
 - CMake (Latest release)
