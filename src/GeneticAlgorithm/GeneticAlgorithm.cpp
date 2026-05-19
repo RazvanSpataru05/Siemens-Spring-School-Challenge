@@ -3,12 +3,14 @@
 GeneticAlgorithm::GeneticAlgorithm(
 	std::function<IIndividual* ()> createIndividual,
 	size_t populationSize, size_t numberOfEpochs,
-	double crossoverProbabillity, double mutationProbability) :
+	double crossoverProbabillity, double mutationProbability,
+	std::unique_ptr<SelectionStrategy> selectionStrategy) :
 	m_createIndividual{ createIndividual },
 	m_populationSize{ populationSize },
 	m_numberOfEpochs{ numberOfEpochs },
 	m_crossoverProbability{ crossoverProbabillity },
-	m_mutationProbability{ mutationProbability }
+	m_mutationProbability{ mutationProbability },
+	m_selectionStrategy{ std::move(selectionStrategy) }
 {
 }
 
@@ -22,6 +24,7 @@ void GeneticAlgorithm::Run()
 
 		m_fitnessValues = CalculateFitnessValues();
 
+		//m_selectionStrategy->Select(m_workingPopulation, m_fitnessValues);
 		Selection();
 		Crossover();
 		Mutation();
@@ -41,7 +44,6 @@ IIndividual* GeneticAlgorithm::GetWinnerIndividual()
 			maxValue = value.second;
 			winner = value.first;
 		}
-
 	return winner;
 }
 
@@ -64,73 +66,30 @@ std::map<IIndividual*, double> GeneticAlgorithm::CalculateFitnessValues()
 		double value = individual->Evaluate();
 		fitnessValues[individual.get()] = value;
 	}
-
 	return fitnessValues;
-}
-
-double GeneticAlgorithm::CalculateSumOfFitnessValues()
-{
-	double sum{};
-	for (const auto& individual : m_workingPopulation)
-	{
-		sum += m_fitnessValues[individual.get()];
-	}
-
-	return sum;
-}
-
-std::vector<double> GeneticAlgorithm::CalculateProbabilityOfSelection()
-{
-	std::vector<double> probabilityOfSelectionVector;
-	double sum = CalculateSumOfFitnessValues();
-
-	for (const auto& individual : m_workingPopulation)
-	{
-		probabilityOfSelectionVector.emplace_back(m_fitnessValues[individual.get()] / sum);
-	}
-
-	return probabilityOfSelectionVector;
-}
-
-std::vector<double> GeneticAlgorithm::CalcutateCumulativeProbabilityOfSelection()
-{
-	std::vector<double> cumulativeProbabilityOfSelectionVector;
-	std::vector<double> probabilityOfSelectionVector = CalculateProbabilityOfSelection();
-
-	for (int currentIndividualIndex = 0; currentIndividualIndex < m_populationSize; ++currentIndividualIndex)
-	{
-		double probability{};
-
-		for (int index = 0; index <= currentIndividualIndex; ++index)
-		{
-			probability += probabilityOfSelectionVector[index];
-		}
-
-		cumulativeProbabilityOfSelectionVector.emplace_back(probability);
-	}
-
-	return cumulativeProbabilityOfSelectionVector;
 }
 
 void GeneticAlgorithm::Selection()
 {
 	std::vector<std::shared_ptr<IIndividual>> newPopulation;
 
-	std::vector<double> cumulativeProbabilityOfSelectionVector = CalcutateCumulativeProbabilityOfSelection();
+	std::vector<double> cumulativeProbabilityOfSelectionVector = GeneticAlgorithmService::CalcutateCumulativeProbabilityOfSelection(m_workingPopulation,
+		m_fitnessValues);
 	std::vector<double> randomNumbers = RandomNumbersGenerator::GenerateRealNumbers(LOWER_BOUND, UPPER_BOUND, m_populationSize);
 
 	for (const auto& randomNumber : randomNumbers)
 	{
-		if (IsGraterThan(randomNumber, LOWER_BOUND) &&
+		if (IsGreaterThan(randomNumber, LOWER_BOUND) &&
 			IsLessThanOrEqualTo(randomNumber, cumulativeProbabilityOfSelectionVector[0]))
 		{
 			newPopulation.push_back(m_workingPopulation[0]);
 			continue;
 		}
 
-		for (size_t probabilityIndex = 0; probabilityIndex < cumulativeProbabilityOfSelectionVector.size() - 1; ++probabilityIndex)
+		for (size_t probabilityIndex = 0; probabilityIndex < cumulativeProbabilityOfSelectionVector.size() - 1;
+			++probabilityIndex)
 		{
-			if (IsGraterThan(randomNumber, cumulativeProbabilityOfSelectionVector[probabilityIndex]) &&
+			if (IsGreaterThan(randomNumber, cumulativeProbabilityOfSelectionVector[probabilityIndex]) &&
 				IsLessThanOrEqualTo(randomNumber, cumulativeProbabilityOfSelectionVector[probabilityIndex + 1]))
 			{
 				newPopulation.push_back(m_workingPopulation[probabilityIndex + 1]);
@@ -138,7 +97,6 @@ void GeneticAlgorithm::Selection()
 			}
 		}
 	}
-
 	m_workingPopulation = newPopulation;
 }
 
@@ -176,7 +134,7 @@ void GeneticAlgorithm::Mutation()
 	}
 }
 
-bool GeneticAlgorithm::IsGraterThan(double value, double lowerBound) const
+bool GeneticAlgorithm::IsGreaterThan(double value, double lowerBound) const
 {
 	return value > lowerBound;
 }

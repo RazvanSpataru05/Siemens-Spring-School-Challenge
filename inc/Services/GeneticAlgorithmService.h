@@ -8,8 +8,20 @@
 class GeneticAlgorithmService
 {
 public:
-	static void RunWithConfigValues();
-	static void RunWithCustomFirstIndividual();
+	static void RunWithConfigValues(std::unique_ptr<SelectionStrategy> selectionStrategy);
+	static void RunWithCustomFirstIndividual(std::unique_ptr<SelectionStrategy> selectionStrategy);
 
 	static void ShowResults();
+
+	static double CalculateSumOfFitnessValues(const std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
+		const std::map<IIndividual*, double> fitnessValues);
+
+	static std::vector<double> CalculateProbabilityOfSelection(
+		const std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
+		const std::map<IIndividual*, double> fitnessValues);
+
+	static std::vector<double> CalcutateCumulativeProbabilityOfSelection(
+		const std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
+		const std::map<IIndividual*, double> fitnessValues);
+
 };

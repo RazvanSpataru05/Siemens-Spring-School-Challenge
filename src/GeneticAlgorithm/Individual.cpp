@@ -92,9 +92,9 @@ void Individual::Crossover(IIndividual& other)
 {
 	// switch strategies here by uncommenting the one you want to use
 
-	// Crossover3DBlock(other);
-	// Crossover2PointPlanar(other);
-	CrossoverSymmetryForced(other);
+	 //Crossover3DBlock(other);
+	 Crossover2PointPlanar(other);
+	//CrossoverSymmetryForced(other);
 }
 
 void Individual::Crossover3DBlock(IIndividual& other)

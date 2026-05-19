@@ -3,8 +3,10 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 #include <Services/constants.h>
+#include <Services/SelectionStrategy.h>
 
 class AlgorithmSettings
 {

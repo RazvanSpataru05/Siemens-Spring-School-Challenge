@@ -13,7 +13,7 @@ double RandomNumbersGenerator::GenerateRealNumberInRange(int lowerBound, int upp
 {
 	std::random_device randomDevice;
 	std::mt19937 generator(randomDevice());
-	std::uniform_real_distribution<> distribution(lowerBound, upperBound);
+	std::uniform_real_distribution<double> distribution(lowerBound, upperBound);
 
 	return distribution(generator);
 }
