@@ -8,6 +8,7 @@
 #include <GeneticAlgorithm/IIndividual.h>
 
 #include <Services/SelectionStrategy.h>
+#include <Services/CrossoverStrategy.h>
 #include <Services/RandomNumbersGenerator.h>
 #include <Services/IOIndividualManager.h>
 #include <Services/GeneticAlgorithmService.h>
@@ -22,7 +23,8 @@ public:
 		size_t numberOfEpochs,
 		double crossoverProbabillity,
 		double mutationProbability,
-		std::unique_ptr<SelectionStrategy> selectionStrategy);
+		std::unique_ptr<SelectionStrategy> selectionStrategy,
+		std::unique_ptr<CrossoverStrategy> crossoverStrategy);
 
 	GeneticAlgorithm(const GeneticAlgorithm& other) = delete;
 	GeneticAlgorithm(GeneticAlgorithm&& other) = delete;
@@ -54,6 +56,7 @@ private:
 	std::vector<std::shared_ptr<IIndividual>> m_workingPopulation;
 
 	std::unique_ptr<SelectionStrategy> m_selectionStrategy;
+	std::unique_ptr<CrossoverStrategy> m_crossoverStrategy;
 
 	std::function<IIndividual* ()> m_createIndividual;
 

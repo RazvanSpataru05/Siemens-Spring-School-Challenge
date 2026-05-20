@@ -38,9 +38,13 @@ public:
 
 	const std::shared_ptr<Building> GetBuilding() const;
 
+	int GetSizeOx() const;
+	int GetSizeOy() const;
+	int GetSizeOz() const;
+	bool IsOnTopLayer(size_t possition) const;
+
 	double Evaluate() override;
 
-	void Crossover(IIndividual& other) override;
 	void Mutation(double mutationProbability) override;
 
 	bool operator==(const Individual& other) const;
@@ -53,11 +57,6 @@ public:
 private:
 	int GetNumberOfRemovedElements();
 	double SimulateAndGetMaximStress();
-	bool IsOnTopLayer(size_t possition);
-
-	void Crossover3DBlock(IIndividual& other);
-	void Crossover2PointPlanar(IIndividual& other);
-	void CrossoverSymmetryForced(IIndividual& other);
 
 private:
 	std::shared_ptr<Building> m_building;

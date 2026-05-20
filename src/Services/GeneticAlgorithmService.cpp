@@ -1,6 +1,6 @@
 #include <Services/GeneticAlgorithmService.h>
 
-void GeneticAlgorithmService::RunWithConfigValues(std::unique_ptr<SelectionStrategy> selectionStrategy)
+void GeneticAlgorithmService::RunWithConfigValues(std::unique_ptr<SelectionStrategy> selectionStrategy, std::unique_ptr<CrossoverStrategy> crossoverStrategy)
 {
 	GeneticAlgorithm geneticAlgorithm(
 		UtilFunctions::CreateIndividualFunction(
@@ -13,12 +13,13 @@ void GeneticAlgorithmService::RunWithConfigValues(std::unique_ptr<SelectionStrat
 		AlgorithmSettings::GetInstance()->GetNumberOfEpochs(),
 		AlgorithmSettings::GetInstance()->GetCrossoverProbability(),
 		AlgorithmSettings::GetInstance()->GetMutationProbability(),
-		std::move(selectionStrategy));
+		std::move(selectionStrategy),
+		std::move(crossoverStrategy));
 
 	geneticAlgorithm.Run();
 }
 
-void GeneticAlgorithmService::RunWithCustomFirstIndividual(std::unique_ptr<SelectionStrategy> selectionStrategy)
+void GeneticAlgorithmService::RunWithCustomFirstIndividual(std::unique_ptr<SelectionStrategy> selectionStrategy, std::unique_ptr<CrossoverStrategy> crossoverStrategy)
 {
 	int oxSize = AlgorithmSettings::GetInstance()->GetOxSize();
 	int oySize = AlgorithmSettings::GetInstance()->GetOySize();
@@ -38,7 +39,8 @@ void GeneticAlgorithmService::RunWithCustomFirstIndividual(std::unique_ptr<Selec
 		AlgorithmSettings::GetInstance()->GetNumberOfEpochs(),
 		AlgorithmSettings::GetInstance()->GetCrossoverProbability(),
 		AlgorithmSettings::GetInstance()->GetMutationProbability(),
-		std::move(selectionStrategy));
+		std::move(selectionStrategy),
+		std::move(crossoverStrategy));
 
 	geneticAlgorithm.Run();
 }

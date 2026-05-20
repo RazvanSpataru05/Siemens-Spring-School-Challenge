@@ -4,13 +4,15 @@ GeneticAlgorithm::GeneticAlgorithm(
 	std::function<IIndividual* ()> createIndividual,
 	size_t populationSize, size_t numberOfEpochs,
 	double crossoverProbabillity, double mutationProbability,
-	std::unique_ptr<SelectionStrategy> selectionStrategy) :
+	std::unique_ptr<SelectionStrategy> selectionStrategy,
+	std::unique_ptr<CrossoverStrategy> crossoverStrategy) :
 	m_createIndividual{ createIndividual },
 	m_populationSize{ populationSize },
 	m_numberOfEpochs{ numberOfEpochs },
 	m_crossoverProbability{ crossoverProbabillity },
 	m_mutationProbability{ mutationProbability },
-	m_selectionStrategy{ std::move(selectionStrategy) }
+	m_selectionStrategy{ std::move(selectionStrategy) },
+	m_crossoverStrategy{ std::move(crossoverStrategy) }
 {
 }
 
@@ -93,7 +95,7 @@ void GeneticAlgorithm::Crossover()
 
 	for (size_t index = 0; index < selectedPopulationForCrossover.size(); index += 2)
 	{
-		selectedPopulationForCrossover[index]->Crossover(*selectedPopulationForCrossover[index + 1]);
+		m_crossoverStrategy->Crossover(*selectedPopulationForCrossover[index], *selectedPopulationForCrossover[index + 1]);
 	}
 }
 
