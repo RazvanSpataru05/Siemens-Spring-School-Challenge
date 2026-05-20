@@ -22,10 +22,9 @@ void GeneticAlgorithm::Run()
 	{
 		std::cout << std::endl << "Epoch: " << index + 1 << std::endl;
 
-		m_fitnessValues = CalculateFitnessValues();
+		CalculateFitnessValues();
 
-		//m_selectionStrategy->Select(m_workingPopulation, m_fitnessValues);
-		Selection();
+		m_selectionStrategy->Select(m_workingPopulation, m_fitnessValues);
 		Crossover();
 		Mutation();
 
@@ -58,46 +57,18 @@ void GeneticAlgorithm::InitializePopulation()
 	}
 }
 
-std::map<IIndividual*, double> GeneticAlgorithm::CalculateFitnessValues()
+void GeneticAlgorithm::CalculateFitnessValues()
 {
-	std::map<IIndividual*, double> fitnessValues;
+	std::vector<std::future<double>> futures;
 	for (const auto& individual : m_workingPopulation)
 	{
-		double value = individual->Evaluate();
-		fitnessValues[individual.get()] = value;
+		futures.push_back(std::async(std::launch::async,
+			[&individual]() {return individual->Evaluate(); }));
 	}
-	return fitnessValues;
-}
-
-void GeneticAlgorithm::Selection()
-{
-	std::vector<std::shared_ptr<IIndividual>> newPopulation;
-
-	std::vector<double> cumulativeProbabilityOfSelectionVector = GeneticAlgorithmService::CalcutateCumulativeProbabilityOfSelection(m_workingPopulation,
-		m_fitnessValues);
-	std::vector<double> randomNumbers = RandomNumbersGenerator::GenerateRealNumbers(LOWER_BOUND, UPPER_BOUND, m_populationSize);
-
-	for (const auto& randomNumber : randomNumbers)
+	for (size_t index = 0; index < m_populationSize; ++index)
 	{
-		if (IsGreaterThan(randomNumber, LOWER_BOUND) &&
-			IsLessThanOrEqualTo(randomNumber, cumulativeProbabilityOfSelectionVector[0]))
-		{
-			newPopulation.push_back(m_workingPopulation[0]);
-			continue;
-		}
-
-		for (size_t probabilityIndex = 0; probabilityIndex < cumulativeProbabilityOfSelectionVector.size() - 1;
-			++probabilityIndex)
-		{
-			if (IsGreaterThan(randomNumber, cumulativeProbabilityOfSelectionVector[probabilityIndex]) &&
-				IsLessThanOrEqualTo(randomNumber, cumulativeProbabilityOfSelectionVector[probabilityIndex + 1]))
-			{
-				newPopulation.push_back(m_workingPopulation[probabilityIndex + 1]);
-				break;
-			}
-		}
+		m_fitnessValues[m_workingPopulation[index].get()] = futures[index].get();
 	}
-	m_workingPopulation = newPopulation;
 }
 
 void GeneticAlgorithm::Crossover()

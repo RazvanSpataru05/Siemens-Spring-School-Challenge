@@ -4,6 +4,7 @@
 #include <chrono/solver/ChIterativeSolverLS.h>
 
 #include <chrono_irrlicht/ChIrrApp.h>
+//#include "chrono_irrlicht/ChVisualSystemIrrlicht.h"
 
 class ConfigureSystem
 {

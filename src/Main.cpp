@@ -3,6 +3,7 @@
 #include <Selection/TournamentSelection.h>
 #include <Selection/RankedSelection.h>
 #include <Selection/StochasticUniversalSamplingSelection.h>
+#include <Selection/RouletteWheelSelection.h>
 
 #include <Scene.h>
 
@@ -14,11 +15,12 @@ int main(int argc, char* argv[]) {
 
 	// Comment / Decomment this to run the second genetic algorithm execution using 
 	// the initial individual from "initial_individual.txt"
-	std::unique_ptr<SelectionStrategy> touramentSelection = std::make_unique<TournamentSelection>(3);
+	std::unique_ptr<SelectionStrategy> tournamentSelection = std::make_unique<TournamentSelection>(3);
 	std::unique_ptr<SelectionStrategy> rankedSelection = std::make_unique<RankedSelection>();
 	std::unique_ptr<SelectionStrategy> stochasticSelection = std::make_unique<StochasticUniversalSamplingSelection>();
+	std::unique_ptr<SelectionStrategy> rouletteWheelSelection = std::make_unique<RouletteWheelSelection>();
 
-	GeneticAlgorithmService::RunWithCustomFirstIndividual(std::move(stochasticSelection));
+	GeneticAlgorithmService::RunWithCustomFirstIndividual(std::move(tournamentSelection));
 	GeneticAlgorithmService::ShowResults();
 
 	// SCENE TESTS

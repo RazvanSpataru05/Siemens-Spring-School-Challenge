@@ -1,5 +1,6 @@
 #pragma once
 
+#include <future>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -38,9 +39,8 @@ public:
 private:
 	void InitializePopulation();
 
-	std::map<IIndividual*, double> CalculateFitnessValues();
+	void CalculateFitnessValues();
 
-	void Selection();
 	void Crossover();
 	void Mutation();
 
