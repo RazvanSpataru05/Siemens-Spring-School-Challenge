@@ -66,9 +66,10 @@ int main(int argc, char* argv[]) {
 	std::cout << "first scene closed\n";
 	if (resultBuilding)
 	{
-		std::cout << "have result, opening second window\n";
-		Scene resultScene;
-		resultScene.Show(resultBuilding);
+		std::cout << "have result, processing it\n";
+		scene.Shutdown();
+		scene.SetOnStartGA({});
+		scene.Show(resultBuilding);
 	}
 	else
 	{

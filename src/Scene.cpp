@@ -47,6 +47,17 @@ void Scene::Show(const std::shared_ptr<Building>& building)
 	}
 }
 
+void Scene::Shutdown()
+{
+	m_configureSystem.reset();
+	m_application.reset();
+	m_system.reset();
+	m_initialized = false;
+
+	MSG msg{};
+	while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
+}
+
 std::shared_ptr<Building> Scene::CreateSimpleWallScene()
 {
 	auto customBuilding = std::make_shared<Building>(1, 1, 1, 2);

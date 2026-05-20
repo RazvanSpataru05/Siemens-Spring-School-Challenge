@@ -26,6 +26,7 @@ public:
 	void SetOnStartGA(std::function<void(const GAConfig&)> callback);
 	void Show(const std::shared_ptr<Building>& building);
 	void RequestClose();
+	void Shutdown();
 
 	std::shared_ptr<Building> CreateCustomWallScene();
 
