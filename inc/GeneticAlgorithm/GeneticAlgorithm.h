@@ -44,6 +44,7 @@ public:
 
 	IIndividual* GetWinnerIndividual();
 	const std::vector<std::vector<bool>>& GetBestEpochIndividual() const;
+	int GetBestFitnessEpochIndex() const;
 
 private:
 	void InitializePopulation();
@@ -63,6 +64,7 @@ private:
 	std::vector<std::shared_ptr<IIndividual>> m_workingPopulation;
 
 	std::vector<std::vector<bool>> m_bestEpochIndividual;
+	std::vector<double> m_epochWinnerFitness;
 
 	std::unique_ptr<SelectionStrategy> m_selectionStrategy;
 	std::unique_ptr<CrossoverStrategy> m_crossoverStrategy;

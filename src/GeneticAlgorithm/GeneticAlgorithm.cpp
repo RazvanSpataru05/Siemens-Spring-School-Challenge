@@ -56,8 +56,31 @@ void GeneticAlgorithm::Run()
 
 		WriteWinners(index);
 		IIndividual* bestIndividual = GetWinnerIndividual();
+		m_epochWinnerFitness.push_back(m_fitnessValues[bestIndividual]);
 		m_bestEpochIndividual.push_back(dynamic_cast<Individual&>(*bestIndividual).GetBuilding()->GetCubesExistence());
 	}
+}
+
+int GeneticAlgorithm::GetBestFitnessEpochIndex() const
+{
+	if (m_epochWinnerFitness.empty())
+	{
+		return 0;
+	}
+
+	int bestIndex = 0;
+	double bestFitness = m_epochWinnerFitness[0];
+
+	for (int index = 1; index < static_cast<int>(m_epochWinnerFitness.size()); ++index)
+	{
+		if (m_epochWinnerFitness[index] > bestFitness)
+		{
+			bestFitness = m_epochWinnerFitness[index];
+			bestIndex = index;
+		}
+	}
+
+	return bestIndex;
 }
 
 IIndividual* GeneticAlgorithm::GetWinnerIndividual()

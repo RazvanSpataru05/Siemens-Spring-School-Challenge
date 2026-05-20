@@ -16,6 +16,15 @@ void ConfigureSystem::SetOnStartGA(std::function<void(const GAConfig&)> callback
     m_onStartGA = std::move(callback);
 }
 
+void ConfigureSystem::SetEpochNavigation(int currentEpochIndex, int epochCount, int bestFitnessEpochIndex,
+    std::function<void(int)> onEpochChange)
+{
+    m_currentEpochIndex = currentEpochIndex;
+    m_epochCount = epochCount;
+    m_bestFitnessEpochIndex = bestFitnessEpochIndex;
+    m_onEpochChange = std::move(onEpochChange);
+}
+
 void ConfigureSystem::SetSystemTimestepper()
 {
 	m_system->SetTimestepperType(chrono::ChTimestepper::Type::EULER_IMPLICIT_LINEARIZED);
@@ -133,6 +142,11 @@ void ConfigureSystem::RunIrrlichtScene()
             ImGui::End();
         }
 
+        if (m_onEpochChange && m_epochCount > 0)
+        {
+            DrawEpochNavigationUI();
+        }
+
         ImGui::Render();
         ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
@@ -141,4 +155,81 @@ void ConfigureSystem::RunIrrlichtScene()
 
     ImGui_ImplDX9_Shutdown();
     ImGui::DestroyContext();
+}
+
+void ConfigureSystem::DrawEpochNavigationUI()
+{
+    const ImVec2 display = ImGui::GetIO().DisplaySize;
+    const float buttonSize = 56.0f;
+    const float margin = 28.0f;
+
+    const bool isBestEpoch = m_bestFitnessEpochIndex >= 0 && m_currentEpochIndex == m_bestFitnessEpochIndex;
+    const ImVec4 goldText = ImVec4(1.0f, 0.84f, 0.0f, 1.0f);
+    const ImVec4 goldWindowBg = ImVec4(0.22f, 0.17f, 0.04f, 0.92f);
+    const ImVec4 goldBorder = ImVec4(0.95f, 0.78f, 0.12f, 0.95f);
+    const ImVec4 defaultWindowBg = ImVec4(0.08f, 0.10f, 0.14f, 0.82f);
+    const ImVec4 defaultBorder = ImVec4(0.35f, 0.55f, 0.95f, 0.65f);
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, isBestEpoch ? goldWindowBg : defaultWindowBg);
+    ImGui::PushStyleColor(ImGuiCol_Border, isBestEpoch ? goldBorder : defaultBorder);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 10.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(14.0f, 10.0f));
+
+    ImGui::SetNextWindowPos(ImVec2(display.x - 210.0f, 18.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(isBestEpoch ? 192.0f : 172.0f, 52.0f), ImGuiCond_Always);
+    ImGui::Begin("EpochIndicator", nullptr,
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar);
+    if (isBestEpoch)
+    {
+        ImGui::TextColored(goldText, "Epoch %d / %d (best)", m_currentEpochIndex + 1, m_epochCount);
+    }
+    else
+    {
+        ImGui::Text("Epoch %d / %d", m_currentEpochIndex + 1, m_epochCount);
+    }
+    ImGui::End();
+
+    const ImGuiWindowFlags navFlags =
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground;
+
+    ImGui::SetNextWindowPos(ImVec2(margin, display.y - buttonSize - margin), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(buttonSize, buttonSize), ImGuiCond_Always);
+    ImGui::Begin("EpochNavLeft", nullptr, navFlags);
+    const bool canGoPrevious = m_currentEpochIndex > 0;
+    if (!canGoPrevious)
+    {
+        ImGui::BeginDisabled();
+    }
+    if (ImGui::Button("<##prev", ImVec2(buttonSize - 8.0f, buttonSize - 8.0f)) && canGoPrevious)
+    {
+        m_onEpochChange(m_currentEpochIndex - 1);
+    }
+    if (!canGoPrevious)
+    {
+        ImGui::EndDisabled();
+    }
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(display.x - buttonSize - margin, display.y - buttonSize - margin), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(buttonSize, buttonSize), ImGuiCond_Always);
+    ImGui::Begin("EpochNavRight", nullptr, navFlags);
+    const bool canGoNext = m_currentEpochIndex < m_epochCount - 1;
+    if (!canGoNext)
+    {
+        ImGui::BeginDisabled();
+    }
+    if (ImGui::Button(">##next", ImVec2(buttonSize - 8.0f, buttonSize - 8.0f)) && canGoNext)
+    {
+        m_onEpochChange(m_currentEpochIndex + 1);
+    }
+    if (!canGoNext)
+    {
+        ImGui::EndDisabled();
+    }
+    ImGui::End();
+
+    ImGui::PopStyleVar(2);
+    ImGui::PopStyleColor(2);
 }

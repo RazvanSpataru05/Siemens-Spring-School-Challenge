@@ -27,7 +27,8 @@ int main(int argc, char* argv[]) {
 	auto initialBuilding = Individual::CreateBuildingFromDetails(
 		oxSize, oySize, ozSize, elementSize, cubesExistence);
 
-	std::shared_ptr<Building> resultBuilding;
+	std::vector<std::shared_ptr<Building>> epochBuildings;
+	int bestFitnessEpochIndex = 0;
 	Scene scene;
 	scene.SetOnStartGA([&](const GAConfig& config)
 		{
@@ -50,11 +51,8 @@ int main(int argc, char* argv[]) {
 					ga.Run();
 					std::cout << "GA RUN FINISHED";
 
-					auto results = GeneticAlgorithmService::ShowResults(ga.GetBestEpochIndividual());
-					if (!results.empty())
-					{
-						resultBuilding = results.back();
-					}
+					bestFitnessEpochIndex = ga.GetBestFitnessEpochIndex();
+					epochBuildings = GeneticAlgorithmService::ShowResults(ga.GetBestEpochIndividual());
 					gaRunning = false;
 					scene.RequestClose();
 				});
@@ -64,16 +62,16 @@ int main(int argc, char* argv[]) {
 	if (gaThread.joinable()) gaThread.join();
 
 	std::cout << "first scene closed\n";
-	if (resultBuilding)
+	if (!epochBuildings.empty())
 	{
 		std::cout << "have result, processing it\n";
 		scene.Shutdown();
 		scene.SetOnStartGA({});
-		scene.Show(resultBuilding);
+		scene.ShowEpochResults(epochBuildings, bestFitnessEpochIndex);
 	}
 	else
 	{
-		std::cout << "resultBuilding is NULL - GA didn't produce results\n";
+		std::cout << "epochBuildings is empty - GA didn't produce results\n";
 	}
 	return 0;
 }
