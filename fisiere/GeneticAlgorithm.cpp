@@ -1,24 +1,4 @@
 #include <GeneticAlgorithm/GeneticAlgorithm.h>
-#include <Crossover/SinglePointCrossover.h>
-#include <Crossover/Block3DCrossover.h>
-#include <Crossover/Planar2PointCrossover.h>
-#include <Crossover/SymmetryForcedCrossover.h>
-
-GeneticAlgorithm::GeneticAlgorithm(
-	std::function<IIndividual* ()> createIndividual,
-	size_t populationSize, size_t numberOfEpochs,
-	double crossoverProbabillity, double mutationProbability,
-	std::unique_ptr<SelectionStrategy> selectionStrategy,
-	std::unique_ptr<CrossoverStrategy> crossoverStrategy) :
-	m_createIndividual{ createIndividual },
-	m_populationSize{ populationSize },
-	m_numberOfEpochs{ numberOfEpochs },
-	m_crossoverProbability{ crossoverProbabillity },
-	m_mutationProbability{ mutationProbability },
-	m_selectionStrategy{ std::move(selectionStrategy) },
-	m_crossoverStrategy{ std::move(crossoverStrategy) }
-{
-}
 
 GeneticAlgorithm::GeneticAlgorithm(
 	std::function<IIndividual* ()> createIndividual,
@@ -31,12 +11,6 @@ GeneticAlgorithm::GeneticAlgorithm(
 	m_mutationProbability{ config.mutationProbability },
 	m_selectionStrategy{ std::move(selectionStrategy) }
 {
-	switch (config.crossoverMethod)
-	{
-	case 0: m_crossoverStrategy = std::make_unique<Block3DCrossover>(); break;
-	case 1: m_crossoverStrategy = std::make_unique<Planar2PointCrossover>(); break;
-	case 2: m_crossoverStrategy = std::make_unique<SymmetryForcedCrossover>(); break;
-	}
 }
 
 void GeneticAlgorithm::Run()
@@ -125,7 +99,7 @@ void GeneticAlgorithm::Crossover()
 
 	for (size_t index = 0; index < selectedPopulationForCrossover.size(); index += 2)
 	{
-		m_crossoverStrategy->Crossover(*selectedPopulationForCrossover[index], *selectedPopulationForCrossover[index + 1]);
+		selectedPopulationForCrossover[index]->Crossover(*selectedPopulationForCrossover[index + 1]);
 	}
 }
 

@@ -8,7 +8,6 @@
 #include <GeneticAlgorithm/IIndividual.h>
 
 #include <Services/SelectionStrategy.h>
-#include <Services/CrossoverStrategy.h>
 #include <Services/RandomNumbersGenerator.h>
 #include <Services/IOIndividualManager.h>
 #include <Services/GeneticAlgorithmService.h>
@@ -18,15 +17,6 @@
 class GeneticAlgorithm
 {
 public:
-	GeneticAlgorithm(
-		std::function<IIndividual* ()> createIndividual,
-		size_t populationSize,
-		size_t numberOfEpochs,
-		double crossoverProbabillity,
-		double mutationProbability,
-		std::unique_ptr<SelectionStrategy> selectionStrategy,
-		std::unique_ptr<CrossoverStrategy> crossoverStrategy);
-
 	GeneticAlgorithm(
 		std::function<IIndividual* ()> createIndividual,
 		const GAConfig& config,
@@ -65,7 +55,6 @@ private:
 	std::vector<std::vector<bool>> m_bestEpochIndividual;
 
 	std::unique_ptr<SelectionStrategy> m_selectionStrategy;
-	std::unique_ptr<CrossoverStrategy> m_crossoverStrategy;
 
 	std::function<IIndividual* ()> m_createIndividual;
 

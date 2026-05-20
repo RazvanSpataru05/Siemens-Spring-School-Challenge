@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 					gaRunning = false;
 					scene.RequestClose();
 				});
-		});
+	});
 	scene.Show(initialBuilding);
 
 	if (gaThread.joinable()) gaThread.join();

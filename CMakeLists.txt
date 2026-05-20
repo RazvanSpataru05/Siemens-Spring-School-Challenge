@@ -192,7 +192,7 @@ set_target_properties(ChronoProject_FinalGA PROPERTIES
 # Link to Chrono libraries and dependency libraries
 #--------------------------------------------------------------
 
-target_link_libraries(ChronoProject_FinalGA ${CHRONO_LIBRARIES})
+target_link_libraries(ChronoProject_FinalGA ${CHRONO_LIBRARIES} d3d9.lib)
 
 #--------------------------------------------------------------
 # === 4 (OPTIONAL) ===
