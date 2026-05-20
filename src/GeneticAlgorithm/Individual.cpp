@@ -1,7 +1,10 @@
 #include <GeneticAlgorithm/Individual.h>
 
-Individual::Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize) :
-	m_sizeOx{ sizeOx }, m_sizeOy{ sizeOy }, m_sizeOz{ sizeOz }, m_elementSize{ elementSize }
+Individual::Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize,
+	double maximStress, std::unique_ptr<IFitnessFunction> fitnessFunction)
+	: m_sizeOx{ sizeOx }, m_sizeOy{ sizeOy }, m_sizeOz{ sizeOz },
+	m_elementSize{ elementSize }, m_maximStress{ maximStress },
+	m_fitnessFunction{ std::move(fitnessFunction) }
 {
 	m_building = std::make_shared<Building>(m_sizeOx, m_sizeOy, m_sizeOz, m_elementSize);
 	m_building->Build();
@@ -10,8 +13,12 @@ Individual::Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize) :
 	m_initialGenes = std::vector<bool>(m_building->GetCubesExistence().size(), true);
 }
 
-Individual::Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize, const std::vector<bool>& cubesExistence) :
-	m_sizeOx{ sizeOx }, m_sizeOy{ sizeOy }, m_sizeOz{ sizeOz }, m_elementSize{ elementSize }
+Individual::Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize,
+	const std::vector<bool>& cubesExistence,
+	double maximStress, std::unique_ptr<IFitnessFunction> fitnessFunction)
+	: m_sizeOx{ sizeOx }, m_sizeOy{ sizeOy }, m_sizeOz{ sizeOz },
+	m_elementSize{ elementSize }, m_maximStress{ maximStress },
+	m_fitnessFunction{ std::move(fitnessFunction) }
 {
 	m_building = std::make_shared<Building>(m_sizeOx, m_sizeOy, m_sizeOz, m_elementSize);
 	m_building->Build();
@@ -61,11 +68,6 @@ Individual& Individual::operator=(Individual&& another) noexcept
 	return *this;
 }
 
-void Individual::SetMaximStress(double maximStress)
-{
-	m_maximStress = maximStress;
-}
-
 const std::shared_ptr<Building> Individual::GetBuilding() const
 {
 	return m_building;
@@ -73,19 +75,15 @@ const std::shared_ptr<Building> Individual::GetBuilding() const
 
 double Individual::Evaluate()
 {
-	double maximStress = SimulateAndGetMaximStress();
-	double value = MINIM_INDIVIDUAL_VALUE;
+	double stress = SimulateAndGetMaximStress();
 
-	if (maximStress >= m_maximStress || maximStress < EPSILON_STRESS)
-	{
-		return value;
-	}
+	if (stress > m_maximStress || stress < EPSILON_STRESS)
+		return MINIM_INDIVIDUAL_VALUE;
 
-	double stressHeadroom = m_maximStress - maximStress;
+	int removedElements = GetNumberOfRemovedElements();
+	int maxRemovedElements = std::count(m_initialGenes.begin(), m_initialGenes.end(), true);
 
-	value = (pow((GetNumberOfRemovedElements() + 1), 2)) * stressHeadroom;
-
-	return value;
+	return m_fitnessFunction->Evaluate(removedElements, maxRemovedElements, stress, m_maximStress);
 }
 
 void Individual::Crossover(IIndividual& other)

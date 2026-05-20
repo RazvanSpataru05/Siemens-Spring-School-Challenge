@@ -16,11 +16,17 @@
 
 #include <System/ConfigureSystem.h>
 
+#include <FitnessFunctions/IFitnessFunction.h>
+
 class Individual : public IIndividual
 {
 public:
-	Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize);
-	Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize, const std::vector<bool>& cubesExistence);
+	Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize,
+		double maximStress, std::unique_ptr<IFitnessFunction> fitnessFunction);
+
+	Individual(int sizeOx, int sizeOy, int sizeOz, double elementSize,
+		const std::vector<bool>& cubesExistence,
+		double maximStress, std::unique_ptr<IFitnessFunction> fitnessFunction);
 
 	Individual(const Individual& another);
 	Individual(Individual&& another) noexcept;
@@ -29,8 +35,6 @@ public:
 	Individual& operator=(Individual&& another) noexcept;
 
 	~Individual() = default;
-
-	void SetMaximStress(double maximStress);
 
 	const std::shared_ptr<Building> GetBuilding() const;
 
@@ -63,6 +67,8 @@ private:
 	int m_sizeOy;
 	int m_sizeOz;
 	double m_elementSize;
+
+	std::unique_ptr<IFitnessFunction> m_fitnessFunction;
 
 	std::vector<bool> m_initialGenes;
 };
