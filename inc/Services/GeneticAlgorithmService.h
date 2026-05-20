@@ -4,12 +4,13 @@
 #include <GeneticAlgorithm/UtilFunctions.h>
 
 #include <Services/AlgorithmSettings.h>
+#include <Services/CrossoverStrategy.h>
 
 class GeneticAlgorithmService
 {
 public:
-	static void RunWithConfigValues(std::unique_ptr<SelectionStrategy> selectionStrategy);
-	static void RunWithCustomFirstIndividual(std::unique_ptr<SelectionStrategy> selectionStrategy);
+	static void RunWithConfigValues(std::unique_ptr<SelectionStrategy> selectionStrategy, std::unique_ptr<CrossoverStrategy> crossoverStrategy);
+	static void RunWithCustomFirstIndividual(std::unique_ptr<SelectionStrategy> selectionStrategy, std::unique_ptr<CrossoverStrategy> crossoverStrategy);
 
 	static void ShowResults();
 

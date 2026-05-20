@@ -5,6 +5,11 @@
 #include <Selection/StochasticUniversalSamplingSelection.h>
 #include <Selection/RouletteWheelSelection.h>
 
+#include <Crossover/SinglePointCrossover.h>
+#include <Crossover/Block3DCrossover.h>
+#include <Crossover/Planar2PointCrossover.h>
+#include <Crossover/SymmetryForcedCrossover.h>
+
 #include <Scene.h>
 
 int main(int argc, char* argv[]) {
@@ -20,7 +25,12 @@ int main(int argc, char* argv[]) {
 	std::unique_ptr<SelectionStrategy> stochasticSelection = std::make_unique<StochasticUniversalSamplingSelection>();
 	std::unique_ptr<SelectionStrategy> rouletteWheelSelection = std::make_unique<RouletteWheelSelection>();
 
-	GeneticAlgorithmService::RunWithCustomFirstIndividual(std::move(tournamentSelection));
+	std::unique_ptr<CrossoverStrategy> singlePointCrossover = std::make_unique<SinglePointCrossover>();
+	std::unique_ptr<CrossoverStrategy> block3DCrossover = std::make_unique<Block3DCrossover>();
+	std::unique_ptr<CrossoverStrategy> planar2PointCrossover = std::make_unique<Planar2PointCrossover>();
+	std::unique_ptr<CrossoverStrategy> symmetryForcedCrossover = std::make_unique<SymmetryForcedCrossover>();
+
+	GeneticAlgorithmService::RunWithCustomFirstIndividual(std::move(tournamentSelection), std::move(singlePointCrossover));
 	GeneticAlgorithmService::ShowResults();
 
 	// SCENE TESTS
