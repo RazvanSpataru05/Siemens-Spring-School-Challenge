@@ -13,3 +13,8 @@ double MultiObjectiveFitnessFunction::Evaluate(int removedElements, int maxRemov
 
     return m_alpha * materialTerm + (1.0 - m_alpha) * safetyTerm;
 }
+
+std::unique_ptr<IFitnessFunction> MultiObjectiveFitnessFunction::Clone() const
+{
+    return std::make_unique<MultiObjectiveFitnessFunction>(m_alpha);
+}

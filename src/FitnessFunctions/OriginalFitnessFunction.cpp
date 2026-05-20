@@ -6,3 +6,8 @@ double OriginalFitnessFunction::Evaluate(int removedElements, int maxRemovedElem
 {
     return pow(removedElements + 1, 2) * (maxStress - simulatedStress);
 }
+
+std::unique_ptr<IFitnessFunction> OriginalFitnessFunction::Clone() const
+{
+    return std::make_unique<OriginalFitnessFunction>();
+}

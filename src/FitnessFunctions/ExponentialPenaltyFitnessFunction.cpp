@@ -7,3 +7,8 @@ double ExponentialPenaltyFitnessFunction::Evaluate(int removedElements, int maxR
 {
     return removedElements * exp(-(simulatedStress / maxStress));
 }
+
+std::unique_ptr<IFitnessFunction> ExponentialPenaltyFitnessFunction::Clone() const
+{
+    return std::make_unique<ExponentialPenaltyFitnessFunction>();
+}

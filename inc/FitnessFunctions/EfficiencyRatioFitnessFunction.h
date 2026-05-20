@@ -10,4 +10,6 @@ public:
 
     double Evaluate(int removedElements, int maxRemovedElements,
         double simulatedStress, double maxStress) override;
+
+    std::unique_ptr<IFitnessFunction> Clone() const override;
 };

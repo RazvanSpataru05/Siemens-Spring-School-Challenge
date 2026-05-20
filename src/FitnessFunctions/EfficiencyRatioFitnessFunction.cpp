@@ -7,3 +7,8 @@ double EfficiencyRatioFitnessFunction::Evaluate(int removedElements, int maxRemo
 {
     return removedElements / (simulatedStress + EPSILON);
 }
+
+std::unique_ptr<IFitnessFunction> EfficiencyRatioFitnessFunction::Clone() const
+{
+    return std::make_unique<EfficiencyRatioFitnessFunction>();
+}

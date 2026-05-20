@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 class IFitnessFunction
 {
 public:
@@ -7,6 +9,8 @@ public:
 
     virtual double Evaluate(int removedElements, int maxRemovedElements,
         double simulatedStress, double maxStress) = 0;
+
+    virtual std::unique_ptr<IFitnessFunction> Clone() const = 0;
 
     virtual ~IFitnessFunction() = default;
 

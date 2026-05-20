@@ -49,6 +49,8 @@ Individual& Individual::operator=(const Individual& another)
 		m_elementSize = another.m_elementSize;
 		m_maximStress = another.m_maximStress;
 		m_building = another.m_building;
+
+		m_fitnessFunction = another.m_fitnessFunction->Clone();
 	}
 	return *this;
 }
@@ -64,6 +66,8 @@ Individual& Individual::operator=(Individual&& another) noexcept
 		m_elementSize = std::exchange(another.m_elementSize, resetValue);
 		m_maximStress = std::exchange(another.m_maximStress, resetValue);
 		m_building = std::exchange(another.m_building, nullptr);
+
+		m_fitnessFunction = std::move(another.m_fitnessFunction);
 	}
 	return *this;
 }
