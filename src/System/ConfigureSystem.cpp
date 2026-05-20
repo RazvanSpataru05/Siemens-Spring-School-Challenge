@@ -75,8 +75,6 @@ void ConfigureSystem::RunIrrlichtScene()
             m_application->GetDevice()->closeDevice();
             break;
         }
-        static int frame2 = 0;
-        if (frame2 < 3) std::cout << "[2] rendering frame " << frame2 << "\n";
             
         ImGui_ImplDX9_NewFrame();
         ImGui::GetIO().DisplaySize = ImVec2((float)screenSize.Width, (float)screenSize.Height);
@@ -85,58 +83,61 @@ void ConfigureSystem::RunIrrlichtScene()
         m_application->BeginScene();
         m_application->DrawAll();
 
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(500, 250), ImGuiCond_FirstUseEver);
-        ImGui::Begin("Genetic Algorithm Confiugration", nullptr, ImGuiWindowFlags_NoMove);
-
-        static int epochs = 5;
-        ImGui::SliderInt("Epochs", &epochs, 5, 1000);
-
-        static int population = 50;
-        ImGui::SliderInt("Population", &population, 50, 1000);
-
-        static float crossoverProbability = 0.2;
-        ImGui::SliderFloat("Crossover Probability", &crossoverProbability, 0.2f, 0.6f, "%.2f");
-
-        static float mutationProbability = 0.01;
-        ImGui::SliderFloat("Mutation Probability", &mutationProbability, 0.01f, 0.20f, "%.2f");
-
-        const char* fitness[] = { "Default" };
-        static int fitnessMethod = 0;
-        ImGui::Combo("Fitness", &fitnessMethod, fitness, 1);
-
-        const char* selection[] = { "Roulette Wheel", "Tournament", "Ranked", "Stochastic Universal Sampling" };
-        static int selectedMethod = 0;
-        ImGui::Combo("Selection", &selectedMethod, selection, 4);
-
-        const char* crossover[] = { "3D Block", "2 Point Planar", "Symmetry Forced" };
-        static int crossoverMethod = 0;
-        ImGui::Combo("Crossover", &crossoverMethod, crossover, 3);
-        
-        if (ImGui::Button("Start Genetic Algorithm"))
+        if (m_onStartGA)
         {
-            if (m_onStartGA)
+            ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+            ImGui::SetNextWindowSize(ImVec2(500, 250), ImGuiCond_FirstUseEver);
+            ImGui::Begin("Genetic Algorithm Confiugration", nullptr, ImGuiWindowFlags_NoMove);
+
+            static int epochs = 5;
+            ImGui::SliderInt("Epochs", &epochs, 5, 1000);
+
+            static int population = 50;
+            ImGui::SliderInt("Population", &population, 50, 1000);
+
+            static float crossoverProbability = 0.2;
+            ImGui::SliderFloat("Crossover Probability", &crossoverProbability, 0.2f, 0.6f, "%.2f");
+
+            static float mutationProbability = 0.01;
+            ImGui::SliderFloat("Mutation Probability", &mutationProbability, 0.01f, 0.20f, "%.2f");
+
+            const char* fitness[] = { "Original Fitness Function", "Efficiency Ratio Fitness Function", 
+                "Exponential Penalty Fitness Function", "Multi Objective Fitness Function"};
+            static int fitnessMethod = 0;
+            ImGui::Combo("Fitness", &fitnessMethod, fitness, 4);
+
+            const char* selection[] = { "Roulette Wheel", "Tournament", "Ranked", "Stochastic Universal Sampling" };
+            static int selectedMethod = 0;
+            ImGui::Combo("Selection", &selectedMethod, selection, 4);
+
+            const char* crossover[] = { "Single Point Crossover", "3D Block", "2 Point Planar", "Symmetry Forced" };
+            static int crossoverMethod = 0;
+            ImGui::Combo("Crossover", &crossoverMethod, crossover, 4);
+            
+            if (ImGui::Button("Start Genetic Algorithm"))
             {
-                GAConfig config;
-                config.epochs = epochs;
-                config.population = population;
-                config.selectionMethod = selectedMethod;
-                config.crossoverMethod = crossoverMethod;
-                config.fitnessMethod = fitnessMethod;
-                config.crossoverProbability = crossoverProbability;
-                config.mutationProbability = mutationProbability;   
-                m_onStartGA(config);
+                if (m_onStartGA)
+                {
+                    GAConfig config;
+                    config.epochs = epochs;
+                    config.population = population;
+                    config.selectionMethod = selectedMethod;
+                    config.crossoverMethod = crossoverMethod;
+                    config.fitnessMethod = fitnessMethod;
+                    config.crossoverProbability = crossoverProbability;
+                    config.mutationProbability = mutationProbability;   
+                    m_onStartGA(config);
+                }
+                ImGui::SetWindowCollapsed(true);
             }
-            ImGui::SetWindowCollapsed(true);
+            ImGui::End();
         }
-        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
         m_application->EndScene();
     }
-    std::cout << "[2] while exited, m_shouldClose=" << m_shouldClose.load() << "\n";
 
     ImGui_ImplDX9_Shutdown();
     ImGui::DestroyContext();

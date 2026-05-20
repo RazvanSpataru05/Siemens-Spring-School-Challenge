@@ -33,9 +33,10 @@ GeneticAlgorithm::GeneticAlgorithm(
 {
 	switch (config.crossoverMethod)
 	{
-	case 0: m_crossoverStrategy = std::make_unique<Block3DCrossover>(); break;
-	case 1: m_crossoverStrategy = std::make_unique<Planar2PointCrossover>(); break;
-	case 2: m_crossoverStrategy = std::make_unique<SymmetryForcedCrossover>(); break;
+	case 0: m_crossoverStrategy = std::make_unique<SinglePointCrossover>(); break;
+	case 1: m_crossoverStrategy = std::make_unique<Block3DCrossover>(); break;
+	case 2: m_crossoverStrategy = std::make_unique<Planar2PointCrossover>(); break;
+	case 3: m_crossoverStrategy = std::make_unique<SymmetryForcedCrossover>(); break;
 	}
 }
 

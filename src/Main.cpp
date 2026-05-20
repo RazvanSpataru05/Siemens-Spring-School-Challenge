@@ -19,8 +19,10 @@ int main(int argc, char* argv[]) {
 	int ozSize = settings->GetOzSize();
 	double elementSize = settings->GetElementSize();
 	auto cubesExistence = IOIndividualManager::ReadInitialIndividual(oxSize * oySize * ozSize);
-	auto createIndividual = UtilFunctions::CreateIndividualFromFileFunction(oxSize, oySize, ozSize, elementSize,
-		cubesExistence, AlgorithmSettings::GetInstance()->GetMaximStressAllowed());
+	auto createIndividual = [&, oxSize, oySize, ozSize, elementSize, cubesExistence](int fitnessMethod) {
+		return UtilFunctions::CreateIndividualFromFileFunction(oxSize, oySize, ozSize, elementSize,
+			cubesExistence, AlgorithmSettings::GetInstance()->GetMaximStressAllowed(), fitnessMethod);
+	};
 
 	auto initialBuilding = Individual::CreateBuildingFromDetails(
 		oxSize, oySize, ozSize, elementSize, cubesExistence);
@@ -43,7 +45,8 @@ int main(int argc, char* argv[]) {
 					case 2: selectionStrategy = std::make_unique<RankedSelection>(); break;
 					case 3: selectionStrategy = std::make_unique<StochasticUniversalSamplingSelection>(); break;
 					}
-					GeneticAlgorithm ga(createIndividual, config, std::move(selectionStrategy));
+					auto individualFactory = createIndividual(config.fitnessMethod);
+					GeneticAlgorithm ga(individualFactory, config, std::move(selectionStrategy));
 					ga.Run();
 					std::cout << "GA RUN FINISHED";
 
@@ -62,8 +65,14 @@ int main(int argc, char* argv[]) {
 
 	std::cout << "first scene closed\n";
 	if (resultBuilding)
+	{
 		std::cout << "have result, opening second window\n";
+		Scene resultScene;
+		resultScene.Show(resultBuilding);
+	}
 	else
+	{
 		std::cout << "resultBuilding is NULL - GA didn't produce results\n";
+	}
 	return 0;
 }

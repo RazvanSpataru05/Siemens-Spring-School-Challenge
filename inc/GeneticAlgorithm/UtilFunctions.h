@@ -9,8 +9,8 @@ class UtilFunctions
 {
 public:
 	static std::function<IIndividual* ()> CreateIndividualFunction(int sizeOx, int sizeOy, int sizeOz, 
-		double elementSize, double maximStress);
+		double elementSize, double maximStress, int fitnessMethod);
 
 	static std::function<IIndividual* ()> CreateIndividualFromFileFunction(int sizeOx, int sizeOy, int sizeOz,
-		double elementSize, const std::vector<bool>& cubesExistence, double maximStress);
+		double elementSize, const std::vector<bool>& cubesExistence, double maximStress, int fitnessMethod);
 };
