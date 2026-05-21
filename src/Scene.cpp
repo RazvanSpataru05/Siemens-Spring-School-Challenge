@@ -15,7 +15,6 @@ void Scene::SetOnStartGA(std::function<void(const GAConfig&)> callback)
 
 void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epochViewerMode)
 {
-	std::cout << "[2] InitSystem start\n";
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -29,12 +28,12 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 		m_system = building->GetSystem();
 	}
 
-	std::cout << "[2] creating ChIrrApp\n";
 	m_application = std::make_shared<chrono::irrlicht::ChIrrApp>(m_system.get(),
 		L"Optimization result", irr::core::dimension2d<irr::u32>(screenWidth, screenHeight));
-	std::cout << "[2] creating ConfigureSystem\n";
 	m_configureSystem = std::make_unique<ConfigureSystem>(m_application, m_system);
 	m_configureSystem->SetOnStartGA(m_onStartGA);
+	if (!m_cachedRemoved.empty())
+		m_configureSystem->SetEpochStats(m_cachedRemoved, m_cachedStress, m_cachedFitness);
 	if (m_epochViewerMode)
 	{
 		m_configureSystem->SetEpochNavigation(
@@ -43,7 +42,6 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 			m_bestFitnessEpochIndex,
 			[this](int epochIndex) { SwitchToEpoch(epochIndex); });
 	}
-	std::cout << "[2] configuring\n";
 	m_configureSystem->ConfigureIrrllichtScene();
 	if (m_epochViewerMode)
 	{
@@ -58,12 +56,9 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	m_configureSystem->SetSystemSover();
 	if (!m_epochViewerMode)
 	{
-		std::cout << "[2] simulating\n";
 		m_configureSystem->Simulate(0.1);
 	}
-	std::cout << "[2] entering Run loop\n";
 	m_configureSystem->RunIrrlichtScene();
-	std::cout << "[2] Run loop EXITED\n";
 }
 
 void Scene::Show(const std::shared_ptr<Building>& building)
@@ -101,6 +96,14 @@ void Scene::ShowEpochResults(const std::vector<std::shared_ptr<Building>>& epoch
 		InitializeSystem(building, true);
 		m_initialized = true;
 	}
+}
+
+void Scene::SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness)
+{
+	m_cachedRemoved = std::move(removed);
+	m_cachedStress = std::move(stress);
+	m_cachedFitness = std::move(fitness);
+	if (m_configureSystem) m_configureSystem->SetEpochStats(std::move(removed), std::move(stress), std::move(fitness));
 }
 
 void Scene::LoadBuildingIntoHost(const std::shared_ptr<Building>& building)

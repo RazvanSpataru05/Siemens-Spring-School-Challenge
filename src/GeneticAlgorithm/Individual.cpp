@@ -77,17 +77,22 @@ const std::shared_ptr<Building> Individual::GetBuilding() const
 	return m_building;
 }
 
+double Individual::GetCurrentMaxStress() const
+{
+	return m_currentMaxStress;
+}
+
 double Individual::Evaluate()
 {
-	double stress = SimulateAndGetMaximStress();
+	m_currentMaxStress = SimulateAndGetMaximStress();
 
-	if (stress > m_maximStress || stress < EPSILON_STRESS)
+	if (m_currentMaxStress > m_maximStress || m_currentMaxStress < EPSILON_STRESS)
 		return MINIM_INDIVIDUAL_VALUE;
 
 	int removedElements = GetNumberOfRemovedElements();
 	int maxRemovedElements = std::count(m_initialGenes.begin(), m_initialGenes.end(), true);
 
-	return m_fitnessFunction->Evaluate(removedElements, maxRemovedElements, stress, m_maximStress);
+	return m_fitnessFunction->Evaluate(removedElements, maxRemovedElements, m_currentMaxStress, m_maximStress);
 }
 
 int Individual::GetSizeOx() const
@@ -158,16 +163,28 @@ std::shared_ptr<Building> Individual::CreateBuildingFromDetails(int sizeOx, int 
 	return building;
 }
 
-int Individual::GetNumberOfRemovedElements()
+int Individual::GetNumberOfRemovedElements() const
 {
 	int numberOfRemovedElements = 0;
 	std::vector<bool> cubesExistence = m_building->GetCubesExistence();
 
-	for (const auto cubeExistence : cubesExistence)
+	for (const auto&cubeExistence : cubesExistence)
+	{
 		if (!cubeExistence)
 			numberOfRemovedElements++;
+	}
 
 	return numberOfRemovedElements;
+}
+
+int Individual::GetNumberOfRemovedElementsWithoutInitialGene() const
+{
+	int count = GetNumberOfRemovedElements();
+	for (size_t index = 0; index < m_initialGenes.size(); ++index)
+	{
+		if (!m_initialGenes[index]) --count;
+	}
+	return count;
 }
 
 double Individual::SimulateAndGetMaximStress()

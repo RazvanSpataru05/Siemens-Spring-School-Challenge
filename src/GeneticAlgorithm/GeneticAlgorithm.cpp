@@ -56,26 +56,28 @@ void GeneticAlgorithm::Run()
 
 		WriteWinners(index);
 		IIndividual* bestIndividual = GetWinnerIndividual();
-		m_epochWinnerFitness.push_back(m_fitnessValues[bestIndividual]);
+		m_bestRemovedPerEpoch.push_back(dynamic_cast<Individual&>(*bestIndividual).GetNumberOfRemovedElementsWithoutInitialGene());
+		m_bestStressPerEpoch.push_back(dynamic_cast<Individual&>(*bestIndividual).GetCurrentMaxStress());
+		m_bestFitnessPerEpoch.push_back(m_fitnessValues[bestIndividual]);
 		m_bestEpochIndividual.push_back(dynamic_cast<Individual&>(*bestIndividual).GetBuilding()->GetCubesExistence());
 	}
 }
 
 int GeneticAlgorithm::GetBestFitnessEpochIndex() const
 {
-	if (m_epochWinnerFitness.empty())
+	if (m_bestFitnessPerEpoch.empty())
 	{
 		return 0;
 	}
 
 	int bestIndex = 0;
-	double bestFitness = m_epochWinnerFitness[0];
+	double bestFitness = m_bestFitnessPerEpoch[0];
 
-	for (int index = 1; index < static_cast<int>(m_epochWinnerFitness.size()); ++index)
+	for (int index = 1; index < static_cast<int>(m_bestFitnessPerEpoch.size()); ++index)
 	{
-		if (m_epochWinnerFitness[index] > bestFitness)
+		if (m_bestFitnessPerEpoch[index] > bestFitness)
 		{
-			bestFitness = m_epochWinnerFitness[index];
+			bestFitness = m_bestFitnessPerEpoch[index];
 			bestIndex = index;
 		}
 	}
@@ -100,6 +102,21 @@ IIndividual* GeneticAlgorithm::GetWinnerIndividual()
 const std::vector<std::vector<bool>>& GeneticAlgorithm::GetBestEpochIndividual() const
 {
 	return m_bestEpochIndividual;
+}
+
+const std::vector<int>& GeneticAlgorithm::GetBestRemovedPerEpoch() const
+{
+	return m_bestRemovedPerEpoch;
+}
+
+const std::vector<double>& GeneticAlgorithm::GetBestStressPerEpoch() const
+{
+	return m_bestStressPerEpoch;
+}
+
+const std::vector<double>& GeneticAlgorithm::GetBestFitnessPerEpoch() const
+{
+	return m_bestFitnessPerEpoch;
 }
 
 void GeneticAlgorithm::InitializePopulation()

@@ -37,6 +37,9 @@ public:
 	~Individual() = default;
 
 	const std::shared_ptr<Building> GetBuilding() const;
+	int GetNumberOfRemovedElements() const;
+	int GetNumberOfRemovedElementsWithoutInitialGene() const;
+	double GetCurrentMaxStress() const;
 
 	int GetSizeOx() const;
 	int GetSizeOy() const;
@@ -55,13 +58,13 @@ public:
 		double elementSize, const std::vector<bool>& cubesExistence);
 
 private:
-	int GetNumberOfRemovedElements();
 	double SimulateAndGetMaximStress();
 
 private:
 	std::shared_ptr<Building> m_building;
 
 	double m_maximStress;
+	double m_currentMaxStress = 0.0;
 	int m_sizeOx;
 	int m_sizeOy;
 	int m_sizeOz;

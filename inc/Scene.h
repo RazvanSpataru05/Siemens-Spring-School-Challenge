@@ -29,6 +29,7 @@ public:
 		int bestFitnessEpochIndex, int startEpochIndex = -1);
 	void RequestClose();
 	void Shutdown();
+	void SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness);
 
 	std::shared_ptr<Building> CreateCustomWallScene();
 
@@ -51,4 +52,8 @@ private:
 	int m_bestFitnessEpochIndex = -1;
 	bool m_epochViewerMode = false;
 	bool m_initialized = false;
+
+	std::vector<int> m_cachedRemoved;
+	std::vector<double> m_cachedStress;
+	std::vector<double> m_cachedFitness;
 };

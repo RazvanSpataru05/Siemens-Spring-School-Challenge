@@ -52,7 +52,9 @@ public:
 	void SetIrrlichtSceneTimestep(double duration);
 	void RunIrrlichtScene();
 
+	void SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness);
 	void DrawEpochNavigationUI();
+	void DrawIndividualStatsPanel();
 
 private:
 	std::shared_ptr<chrono::irrlicht::ChIrrApp> m_application;
@@ -64,4 +66,8 @@ private:
 	int m_epochCount = 0;
 	int m_bestFitnessEpochIndex = -1;
 	std::atomic<bool> m_shouldClose{ false };
+
+	std::vector<int> m_removedElementsPerEpoch;
+	std::vector<double> m_maxStresPerEpoch;
+	std::vector<double> m_fitnessPerEpoch;
 };

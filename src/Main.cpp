@@ -49,7 +49,10 @@ int main(int argc, char* argv[]) {
 					auto individualFactory = createIndividual(config.fitnessMethod);
 					GeneticAlgorithm ga(individualFactory, config, std::move(selectionStrategy));
 					ga.Run();
-					std::cout << "GA RUN FINISHED";
+					scene.SetEpochStats(
+						ga.GetBestRemovedPerEpoch(),
+						ga.GetBestStressPerEpoch(),
+						ga.GetBestFitnessPerEpoch());
 
 					bestFitnessEpochIndex = ga.GetBestFitnessEpochIndex();
 					epochBuildings = GeneticAlgorithmService::ShowResults(ga.GetBestEpochIndividual());
@@ -61,17 +64,11 @@ int main(int argc, char* argv[]) {
 
 	if (gaThread.joinable()) gaThread.join();
 
-	std::cout << "first scene closed\n";
 	if (!epochBuildings.empty())
 	{
-		std::cout << "have result, processing it\n";
 		scene.Shutdown();
 		scene.SetOnStartGA({});
 		scene.ShowEpochResults(epochBuildings, bestFitnessEpochIndex);
-	}
-	else
-	{
-		std::cout << "epochBuildings is empty - GA didn't produce results\n";
 	}
 	return 0;
 }
