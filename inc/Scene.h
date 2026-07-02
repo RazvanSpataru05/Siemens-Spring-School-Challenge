@@ -1,12 +1,5 @@
 #pragma once
 
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#undef near
-#undef far
-#undef FAR
-
 #include <Services/GAConfig.h>
 
 #include <chrono/fea/ChLinkPointFrame.h>
@@ -24,7 +17,7 @@ public:
 	~Scene() = default;
 
 	void SetOnStartGA(std::function<void(const GAConfig&)> callback);
-	void Show(const std::shared_ptr<Building>& building);
+	void ShowInitialBuilding(const std::shared_ptr<Building>& building);
 	void ShowEpochResults(const std::vector<std::shared_ptr<Building>>& epochBuildings,
 		int bestFitnessEpochIndex, int startEpochIndex = -1);
 	void RequestClose();

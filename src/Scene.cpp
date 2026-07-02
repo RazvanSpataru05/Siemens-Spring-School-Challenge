@@ -15,8 +15,8 @@ void Scene::SetOnStartGA(std::function<void(const GAConfig&)> callback)
 
 void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epochViewerMode)
 {
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	m_epochViewerMode = epochViewerMode;
 	if (m_epochViewerMode)
@@ -34,6 +34,7 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	m_configureSystem->SetOnStartGA(m_onStartGA);
 	if (!m_cachedRemoved.empty())
 		m_configureSystem->SetEpochStats(m_cachedRemoved, m_cachedStress, m_cachedFitness);
+
 	if (m_epochViewerMode)
 	{
 		m_configureSystem->SetEpochNavigation(
@@ -51,9 +52,11 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	{
 		m_configureSystem->InitializeIrrlichtScene();
 	}
+
 	m_configureSystem->SetIrrlichtSceneTimestep(0.001);
 	m_configureSystem->SetSystemTimestepper();
 	m_configureSystem->SetSystemSover();
+
 	if (!m_epochViewerMode)
 	{
 		m_configureSystem->Simulate(0.1);
@@ -61,7 +64,7 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	m_configureSystem->RunIrrlichtScene();
 }
 
-void Scene::Show(const std::shared_ptr<Building>& building)
+void Scene::ShowInitialBuilding(const std::shared_ptr<Building>& building)
 {
 	SetVisualizationProperties(building);
 
@@ -170,12 +173,13 @@ void Scene::Shutdown()
 
 void Scene::SetVisualizationProperties(const std::shared_ptr<Building>& building)
 {
+	auto& mesh = *building->GetMesh();
 	ObjectProperties::SetVisualizationMesh(building->GetMesh(),
-		std::make_shared<chrono::fea::ChVisualizationFEAmesh>(*(building->GetMesh().get())));
+		std::make_shared<chrono::fea::ChVisualizationFEAmesh>(mesh));
 	ObjectProperties::SetVisualizationMeshReference(building->GetMesh(),
-		std::make_shared<chrono::fea::ChVisualizationFEAmesh>(*(building->GetMesh().get())));
+		std::make_shared<chrono::fea::ChVisualizationFEAmesh>(mesh));
 	ObjectProperties::SetVisualizationMeshPoints(building->GetMesh(),
-		std::make_shared<chrono::fea::ChVisualizationFEAmesh>(*(building->GetMesh().get())));
+		std::make_shared<chrono::fea::ChVisualizationFEAmesh>(mesh));
 }
 
 void Scene::RequestClose()

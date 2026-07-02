@@ -17,7 +17,7 @@ GAApplication::GAApplication()
 
 void GAApplication::Run()
 {
-	m_scene.Show(m_initialBuilding);
+	m_scene.ShowInitialBuilding(m_initialBuilding);
 
 	if (m_gaThread.joinable()) m_gaThread.join();
 

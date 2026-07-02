@@ -89,6 +89,11 @@ void ConfigureSystem::RunIrrlichtScene()
         ImGui::GetIO().DisplaySize = ImVec2((float)screenSize.Width, (float)screenSize.Height);
         ImGui::NewFrame();
 
+        if (ImGui::IsKeyPressed(ImGuiKey_H, false))
+        {
+            m_panelsVisible = !m_panelsVisible;
+        }
+
         m_application->BeginScene();
         m_application->DrawAll();
 
@@ -142,7 +147,7 @@ void ConfigureSystem::RunIrrlichtScene()
             ImGui::End();
         }
 
-        if (m_onEpochChange && m_epochCount > 0)
+        if (m_panelsVisible && m_onEpochChange && m_epochCount > 0)
         {
             DrawEpochNavigationUI();
             DrawIndividualStatsPanel();

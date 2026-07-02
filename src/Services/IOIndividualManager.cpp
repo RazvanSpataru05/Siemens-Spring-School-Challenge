@@ -46,7 +46,7 @@ void IOIndividualManager::ReadIndividualsDetailsAndCreateBuildings()
 
 			readBuilding = Individual::CreateBuildingFromDetails(sizeOx, sizeOy, sizeOz, elementSize, cubesExistence);
 			Scene scene;
-			scene.Show(readBuilding);
+			scene.ShowInitialBuilding(readBuilding);
 
 			cubesExistence.clear();
 		}

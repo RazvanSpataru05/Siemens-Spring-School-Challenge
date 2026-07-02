@@ -41,6 +41,14 @@ bool ImGuiEventReceiver::OnEvent(const irr::SEvent& event)
 
     if (event.EventType == irr::EET_KEY_INPUT_EVENT)
     {
+        ImGuiIO& io = ImGui::GetIO();
+
+        ImGuiKey key = IrrlichtKeyToImGuiKey(event.KeyInput.Key);
+        if (key != ImGuiKey_None)
+        {
+            io.AddKeyEvent(key, event.KeyInput.PressedDown);
+        }
+
         if (event.KeyInput.Char != 0 && event.KeyInput.PressedDown)
         {
             io.AddInputCharacter(event.KeyInput.Char);
@@ -49,4 +57,13 @@ bool ImGuiEventReceiver::OnEvent(const irr::SEvent& event)
     }
 
     return false;
+}
+
+ImGuiKey ImGuiEventReceiver::IrrlichtKeyToImGuiKey(irr::EKEY_CODE key)
+{
+    switch (key)
+    {
+    case irr::KEY_KEY_H: return ImGuiKey_H;
+    default: return ImGuiKey_None;
+    }
 }

@@ -70,4 +70,6 @@ private:
 	std::vector<int> m_removedElementsPerEpoch;
 	std::vector<double> m_maxStresPerEpoch;
 	std::vector<double> m_fitnessPerEpoch;
+
+	bool m_panelsVisible{ true };
 };
