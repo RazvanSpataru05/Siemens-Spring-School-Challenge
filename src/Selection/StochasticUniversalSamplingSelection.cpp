@@ -21,16 +21,12 @@ void StochasticUniversalSamplingSelection::Select(std::vector<std::shared_ptr<II
 		pointers.emplace_back(randomNumber + index * step);
 	}
 
+	size_t individualIndex = 0;
 	for (const auto& pointer : pointers)
 	{
-		for (size_t index = 0; index < populationSize; ++index)
-		{
-			if (cumulativeProbabilities[index] >= pointer)
-			{
-				newPopulation.push_back(workingPopulation[index]);
-				break;
-			}
-		}
+		while (cumulativeProbabilities[individualIndex] < pointer)
+			++individualIndex;
+		newPopulation.push_back(workingPopulation[individualIndex]);
 	}
 	workingPopulation = std::move(newPopulation);
 }

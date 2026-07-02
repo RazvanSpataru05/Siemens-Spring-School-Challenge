@@ -96,7 +96,7 @@ void ConfigureSystem::RunIrrlichtScene()
         {
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
             ImGui::SetNextWindowSize(ImVec2(500, 250), ImGuiCond_FirstUseEver);
-            ImGui::Begin("Genetic Algorithm Confiugration", nullptr, ImGuiWindowFlags_NoMove);
+            ImGui::Begin("Genetic Algorithm Configuration", nullptr, ImGuiWindowFlags_NoMove);
 
             static int epochs = 5;
             ImGui::SliderInt("Epochs", &epochs, 5, 1000);

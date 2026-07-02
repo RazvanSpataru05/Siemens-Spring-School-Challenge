@@ -31,11 +31,7 @@ public:
 	void Shutdown();
 	void SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness);
 
-	std::shared_ptr<Building> CreateCustomWallScene();
-
 private:
-	std::shared_ptr<Building> CreateSimpleWallScene();
-	std::shared_ptr<Building> CreateComplexWallScene();
 
 	void InitializeSystem(const std::shared_ptr<Building>& building, bool epochViewerMode = false);
 	void SetVisualizationProperties(const std::shared_ptr<Building>& building);
@@ -48,6 +44,7 @@ private:
 	std::shared_ptr<chrono::ChSystemSMC> m_system;
 	std::function<void(const GAConfig&)> m_onStartGA;
 	std::vector<std::shared_ptr<Building>> m_epochBuildings;
+
 	int m_currentEpochIndex = 0;
 	int m_bestFitnessEpochIndex = -1;
 	bool m_epochViewerMode = false;

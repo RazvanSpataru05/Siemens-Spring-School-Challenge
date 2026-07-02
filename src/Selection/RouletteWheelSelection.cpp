@@ -24,7 +24,7 @@ void RouletteWheelSelection::Select(std::vector<std::shared_ptr<IIndividual>>& w
 			}
 		}
 	}
-	workingPopulation = newPopulation;
+	workingPopulation = std::move(newPopulation);
 }
 
 RouletteWheelSelection::~RouletteWheelSelection()

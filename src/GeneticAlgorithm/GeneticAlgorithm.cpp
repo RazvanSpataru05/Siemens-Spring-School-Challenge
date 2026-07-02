@@ -65,15 +65,12 @@ void GeneticAlgorithm::Run()
 
 int GeneticAlgorithm::GetBestFitnessEpochIndex() const
 {
-	if (m_bestFitnessPerEpoch.empty())
-	{
-		return 0;
-	}
+	if (m_bestFitnessPerEpoch.empty()) return 0;
 
 	int bestIndex = 0;
 	double bestFitness = m_bestFitnessPerEpoch[0];
 
-	for (int index = 1; index < static_cast<int>(m_bestFitnessPerEpoch.size()); ++index)
+	for (size_t index = 1; index < m_bestFitnessPerEpoch.size(); ++index)
 	{
 		if (m_bestFitnessPerEpoch[index] > bestFitness)
 		{
@@ -81,7 +78,6 @@ int GeneticAlgorithm::GetBestFitnessEpochIndex() const
 			bestIndex = index;
 		}
 	}
-
 	return bestIndex;
 }
 
@@ -91,11 +87,13 @@ IIndividual* GeneticAlgorithm::GetWinnerIndividual()
 	IIndividual* winner = nullptr;
 
 	for (const auto value : m_fitnessValues)
+	{
 		if (value.second > maxValue)
 		{
 			maxValue = value.second;
 			winner = value.first;
 		}
+	}
 	return winner;
 }
 
@@ -121,7 +119,7 @@ const std::vector<double>& GeneticAlgorithm::GetBestFitnessPerEpoch() const
 
 void GeneticAlgorithm::InitializePopulation()
 {
-	for (int index = 0; index < m_populationSize; ++index)
+	for (size_t index = 0; index < m_populationSize; ++index)
 	{
 		std::cout << "Created individual " << index + 1 << "\n";
 

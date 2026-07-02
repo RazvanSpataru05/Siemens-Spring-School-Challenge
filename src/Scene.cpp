@@ -29,7 +29,7 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	}
 
 	m_application = std::make_shared<chrono::irrlicht::ChIrrApp>(m_system.get(),
-		L"Optimization result", irr::core::dimension2d<irr::u32>(screenWidth, screenHeight));
+		L"Genetic Algorithm Configuration", irr::core::dimension2d<irr::u32>(screenWidth, screenHeight));
 	m_configureSystem = std::make_unique<ConfigureSystem>(m_application, m_system);
 	m_configureSystem->SetOnStartGA(m_onStartGA);
 	if (!m_cachedRemoved.empty())
@@ -75,10 +75,7 @@ void Scene::Show(const std::shared_ptr<Building>& building)
 void Scene::ShowEpochResults(const std::vector<std::shared_ptr<Building>>& epochBuildings,
 	int bestFitnessEpochIndex, int startEpochIndex)
 {
-	if (epochBuildings.empty())
-	{
-		return;
-	}
+	if (epochBuildings.empty()) return;
 
 	m_epochBuildings = epochBuildings;
 	m_bestFitnessEpochIndex = bestFitnessEpochIndex;
@@ -103,7 +100,7 @@ void Scene::SetEpochStats(std::vector<int> removed, std::vector<double> stress, 
 	m_cachedRemoved = std::move(removed);
 	m_cachedStress = std::move(stress);
 	m_cachedFitness = std::move(fitness);
-	if (m_configureSystem) m_configureSystem->SetEpochStats(std::move(removed), std::move(stress), std::move(fitness));
+	if (m_configureSystem) m_configureSystem->SetEpochStats(m_cachedRemoved, m_cachedStress, m_cachedFitness);
 }
 
 void Scene::LoadBuildingIntoHost(const std::shared_ptr<Building>& building)
@@ -169,55 +166,6 @@ void Scene::Shutdown()
 
 	MSG msg{};
 	while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
-}
-
-std::shared_ptr<Building> Scene::CreateSimpleWallScene()
-{
-	auto customBuilding = std::make_shared<Building>(1, 1, 1, 2);
-
-	customBuilding->Build();
-	customBuilding->AddConstraints();
-
-	return customBuilding;
-}
-
-std::shared_ptr<Building> Scene::CreateComplexWallScene()
-{
-	auto customBuilding = std::make_shared<Building>(20, 8, 5, 0.05);
-	customBuilding->Build();
-	customBuilding->AddConstraints();
-
-	std::vector<bool> importanceForEliminatingCubes = std::vector<bool>(20 * 8 * 5, true);
-
-	for (int i = 0; i < importanceForEliminatingCubes.size(); ++i)
-		importanceForEliminatingCubes[i] = false;
-
-	customBuilding->EliminateCubesBasedOnCubesExistence(importanceForEliminatingCubes);
-
-	for (int i = 0; i < importanceForEliminatingCubes.size(); ++i)
-		importanceForEliminatingCubes[i] = true;
-
-	customBuilding->AddCubesBasedOnCubesExistence(importanceForEliminatingCubes);
-
-	importanceForEliminatingCubes[0] = false;
-	importanceForEliminatingCubes[1] = false;
-	importanceForEliminatingCubes[19] = false;
-	importanceForEliminatingCubes[18] = false;
-
-	customBuilding->EliminateCubesBasedOnCubesExistence(importanceForEliminatingCubes);
-
-	importanceForEliminatingCubes[1] = true;
-	importanceForEliminatingCubes[5] = true;
-	importanceForEliminatingCubes[19] = true;
-
-	customBuilding->AddCubesBasedOnCubesExistence(importanceForEliminatingCubes);
-
-	return customBuilding;
-}
-
-std::shared_ptr<Building> Scene::CreateCustomWallScene()
-{
-	return CreateSimpleWallScene();
 }
 
 void Scene::SetVisualizationProperties(const std::shared_ptr<Building>& building)

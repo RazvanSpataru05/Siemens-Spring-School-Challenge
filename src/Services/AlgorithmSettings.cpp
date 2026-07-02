@@ -4,8 +4,7 @@ AlgorithmSettings* AlgorithmSettings::m_instance = NULL;
 
 AlgorithmSettings* AlgorithmSettings::GetInstance()
 {
-	if (!m_instance)
-		m_instance = new AlgorithmSettings();
+	if (!m_instance) m_instance = new AlgorithmSettings();
 
 	return m_instance;
 }

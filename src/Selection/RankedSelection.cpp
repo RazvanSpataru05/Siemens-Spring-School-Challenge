@@ -25,16 +25,13 @@ void RankedSelection::Select(std::vector<std::shared_ptr<IIndividual>>& workingP
 	}
 
 	std::vector<double> randomNumbers = RandomNumbersGenerator::GenerateRealNumbers(0, 1, populationSize);
+	std::sort(randomNumbers.begin(), randomNumbers.end());
+	size_t individualIndex = 0;
 	for (const auto& randomNumber : randomNumbers)
 	{
-		for (size_t index = 0; index < populationSize; ++index)
-		{
-			if (cumulativeProbabilities[index] >= randomNumber)
-			{
-				newPopulation.push_back(workingPopulation[index]);
-				break;
-			}
-		}
+		while (cumulativeProbabilities[individualIndex] < randomNumber)
+			++individualIndex;
+		newPopulation.push_back(workingPopulation[individualIndex]);
 	}
 	workingPopulation = std::move(newPopulation);
 }
