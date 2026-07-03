@@ -193,7 +193,7 @@ double Individual::SimulateAndGetMaximStress()
 	
 	ConfigureSystem configureSystem(clone->GetSystem());
 	configureSystem.SetSystemTimestepper();
-	configureSystem.SetSystemSover();
+	configureSystem.SetSystemSolver();
 	configureSystem.Simulate(0.1);
 
 	double maximStress = 0.0;

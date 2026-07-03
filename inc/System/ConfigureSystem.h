@@ -22,19 +22,18 @@
 #include <d3d9.h>
 
 #include <System/ImGuiEventReceiver.h>
+#include <System/CameraRotationReceiver.h>
 
 class ConfigureSystem
 {
 public:
+	static constexpr float K_BASE_ROTATION_SPEED{ 0.05f };
+	static const irr::core::vector3df K_INITIAL_POSITION;
+
+public:
 	ConfigureSystem(const std::shared_ptr<chrono::ChSystemSMC>& system);
 	ConfigureSystem(const std::shared_ptr<chrono::irrlicht::ChIrrApp>& application,
 		const std::shared_ptr<chrono::ChSystemSMC>& system);
-
-	ConfigureSystem(const ConfigureSystem& other) = delete;
-	ConfigureSystem(ConfigureSystem&& other) = delete;
-
-	ConfigureSystem& operator=(const ConfigureSystem& other) = delete;
-	ConfigureSystem& operator=(ConfigureSystem&& other) = delete;
 
 	~ConfigureSystem() = default;
 
@@ -43,7 +42,8 @@ public:
 		std::function<void(int)> onEpochChange);
 
 	void SetSystemTimestepper();
-	void SetSystemSover();
+	void SetSystemSolver();
+	void SetupCamera();
 	void Simulate(double duration);
 	void RequestClose();
 
@@ -51,10 +51,19 @@ public:
 	void InitializeIrrlichtScene();
 	void SetIrrlichtSceneTimestep(double duration);
 	void RunIrrlichtScene();
+	void ManageKeyStrokes();
 
 	void SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness);
+	void DrawCameraControlsUI();
 	void DrawEpochNavigationUI();
 	void DrawIndividualStatsPanel();
+
+private:
+	ConfigureSystem(const ConfigureSystem& other) = delete;
+	ConfigureSystem(ConfigureSystem&& other) = delete;
+
+	ConfigureSystem& operator=(const ConfigureSystem& other) = delete;
+	ConfigureSystem& operator=(ConfigureSystem&& other) = delete;
 
 private:
 	std::shared_ptr<chrono::irrlicht::ChIrrApp> m_application;
@@ -72,4 +81,6 @@ private:
 	std::vector<double> m_fitnessPerEpoch;
 
 	bool m_panelsVisible{ true };
+	bool m_cameraAutoRotation{ false };
+	float m_cameraRotationSpeed{ 1.0f };
 };

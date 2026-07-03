@@ -55,7 +55,7 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 
 	m_configureSystem->SetIrrlichtSceneTimestep(0.001);
 	m_configureSystem->SetSystemTimestepper();
-	m_configureSystem->SetSystemSover();
+	m_configureSystem->SetSystemSolver();
 
 	if (!m_epochViewerMode)
 	{
@@ -134,7 +134,7 @@ void Scene::LoadBuildingIntoHost(const std::shared_ptr<Building>& building)
 	}
 
 	m_configureSystem->SetSystemTimestepper();
-	m_configureSystem->SetSystemSover();
+	m_configureSystem->SetSystemSolver();
 	m_configureSystem->Simulate(0.1);
 	m_application->AssetBindAll();
 	m_application->AssetUpdateAll();
@@ -168,7 +168,7 @@ void Scene::Shutdown()
 	m_initialized = false;
 
 	MSG msg{};
-	while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
+	//while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
 }
 
 void Scene::SetVisualizationProperties(const std::shared_ptr<Building>& building)
