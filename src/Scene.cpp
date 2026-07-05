@@ -168,7 +168,7 @@ void Scene::Shutdown()
 	m_initialized = false;
 
 	MSG msg{};
-	//while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
+	while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
 }
 
 void Scene::SetVisualizationProperties(const std::shared_ptr<Building>& building)

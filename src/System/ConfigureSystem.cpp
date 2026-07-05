@@ -202,6 +202,10 @@ void ConfigureSystem::ManageKeyStrokes()
 		m_cameraAutoRotation = false;
 		SetupCamera();
 	}
+	if (ImGui::IsKeyPressed(ImGuiKey_Space, false) && m_onEpochChange)
+	{
+		m_cameraAutoRotation = !m_cameraAutoRotation;
+	}
 }
 
 void ConfigureSystem::SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness)

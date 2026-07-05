@@ -75,6 +75,7 @@ ImGuiKey ImGuiEventReceiver::IrrlichtKeyToImGuiKey(irr::EKEY_CODE key)
 	case irr::KEY_KEY_H: return ImGuiKey_H;
 	case irr::KEY_KEY_R: return ImGuiKey_R;
 	case irr::KEY_ESCAPE: return ImGuiKey_Escape;
+	case irr::KEY_SPACE: return ImGuiKey_Space;
 	default: return ImGuiKey_None;
 	}
 }
