@@ -27,7 +27,3 @@ void TournamentSelection::Select(std::vector<std::shared_ptr<IIndividual>>& work
 	}
 	workingPopulation = std::move(newPopulation);
 }
-
-TournamentSelection::~TournamentSelection()
-{
-}

@@ -1,11 +1,10 @@
 #include <Selection/StochasticUniversalSamplingSelection.h>
 
-StochasticUniversalSamplingSelection::StochasticUniversalSamplingSelection() {}
-
 void StochasticUniversalSamplingSelection::Select(std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 	const std::map<IIndividual*, double>& fitnessValues)
 {
-	std::vector<double> cumulativeProbabilities = GeneticAlgorithmService::CalcutateCumulativeProbabilityOfSelection(
+	std::vector<double> cumulativeProbabilities = 
+		GeneticAlgorithmService::CalcutateCumulativeProbabilityOfSelection(
 		workingPopulation, fitnessValues);
 	size_t populationSize = workingPopulation.size();
 	double step = 1.0 / static_cast<double>(populationSize);
@@ -30,5 +29,3 @@ void StochasticUniversalSamplingSelection::Select(std::vector<std::shared_ptr<II
 	}
 	workingPopulation = std::move(newPopulation);
 }
-
-StochasticUniversalSamplingSelection::~StochasticUniversalSamplingSelection() {}

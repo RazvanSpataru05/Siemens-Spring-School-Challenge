@@ -1,7 +1,5 @@
 #include <Selection/RankedSelection.h>
 
-RankedSelection::RankedSelection() {}
-
 void RankedSelection::Select(std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 	const std::map<IIndividual*, double>& fitnessValues)
 {
@@ -35,5 +33,3 @@ void RankedSelection::Select(std::vector<std::shared_ptr<IIndividual>>& workingP
 	}
 	workingPopulation = std::move(newPopulation);
 }
-
-RankedSelection::~RankedSelection() {}

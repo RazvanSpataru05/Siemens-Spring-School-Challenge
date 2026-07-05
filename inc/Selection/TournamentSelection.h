@@ -5,12 +5,11 @@
 class TournamentSelection : public SelectionStrategy
 {
 public:
-	TournamentSelection(int tournamentSize);
+	TournamentSelection(int tournamentSize = 3);
+	~TournamentSelection() = default;
 
 	void Select(std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 		const std::map<IIndividual*, double>& fitnessValues);
-
-	~TournamentSelection();
 
 private:
 	int m_tournamentSize;

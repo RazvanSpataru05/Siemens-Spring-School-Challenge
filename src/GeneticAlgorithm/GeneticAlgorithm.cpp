@@ -1,8 +1,4 @@
 #include <GeneticAlgorithm/GeneticAlgorithm.h>
-#include <Crossover/SinglePointCrossover.h>
-#include <Crossover/Block3DCrossover.h>
-#include <Crossover/Planar2PointCrossover.h>
-#include <Crossover/SymmetryForcedCrossover.h>
 
 GeneticAlgorithm::GeneticAlgorithm(
 	std::function<IIndividual* ()> createIndividual,

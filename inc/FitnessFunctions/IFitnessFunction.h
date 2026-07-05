@@ -9,12 +9,10 @@ public:
 
     virtual double Evaluate(int removedElements, int maxRemovedElements,
         double simulatedStress, double maxStress) = 0;
-
     virtual std::unique_ptr<IFitnessFunction> Clone() const = 0;
-
     virtual ~IFitnessFunction() = default;
 
 private:
-    IFitnessFunction(const IFitnessFunction& other) = delete;
-    IFitnessFunction& operator=(const IFitnessFunction& other) = delete;
+    IFitnessFunction(const IFitnessFunction&) = delete;
+    IFitnessFunction& operator=(const IFitnessFunction&) = delete;
 };

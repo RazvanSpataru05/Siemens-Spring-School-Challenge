@@ -1,4 +1,5 @@
 #pragma once
+
 #include <FitnessFunctions/IFitnessFunction.h>
 
 class MultiObjectiveFitnessFunction : public IFitnessFunction

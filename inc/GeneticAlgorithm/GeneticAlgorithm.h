@@ -15,6 +15,11 @@
 #include <Services/GAConfig.h>
 #include <Services/constants.h>
 
+#include <Crossover/SinglePointCrossover.h>
+#include <Crossover/Block3DCrossover.h>
+#include <Crossover/Planar2PointCrossover.h>
+#include <Crossover/SymmetryForcedCrossover.h>
+
 class GeneticAlgorithm
 {
 public:

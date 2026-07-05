@@ -7,10 +7,9 @@
 class RankedSelection : public SelectionStrategy
 {
 public:
-	RankedSelection();
+	RankedSelection() = default;
+	~RankedSelection() = default;
 
 	void Select(std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 		const std::map<IIndividual*, double>& fitnessValues);
-
-	~RankedSelection();
 };

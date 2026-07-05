@@ -6,10 +6,9 @@
 class RouletteWheelSelection : public SelectionStrategy
 {
 public:
-	RouletteWheelSelection();
+	RouletteWheelSelection() = default;
+	~RouletteWheelSelection() = default;
 
 	void Select(std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 		const std::map<IIndividual*, double>& fitnessValues);
-
-	~RouletteWheelSelection();
 };

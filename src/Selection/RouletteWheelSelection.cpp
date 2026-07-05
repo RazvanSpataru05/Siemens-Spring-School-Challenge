@@ -1,9 +1,5 @@
 #include <Selection/RouletteWheelSelection.h>
 
-RouletteWheelSelection::RouletteWheelSelection()
-{
-}
-
 void RouletteWheelSelection::Select(std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 	const std::map<IIndividual*, double>& fitnessValues)
 {
@@ -25,8 +21,4 @@ void RouletteWheelSelection::Select(std::vector<std::shared_ptr<IIndividual>>& w
 		}
 	}
 	workingPopulation = std::move(newPopulation);
-}
-
-RouletteWheelSelection::~RouletteWheelSelection()
-{
 }
