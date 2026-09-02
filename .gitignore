@@ -422,3 +422,17 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+# ---------------------------------------------------------------------------
+# ChronoProject_FinalGA
+# ---------------------------------------------------------------------------
+
+# CMake build trees (build/ from CMakePresets, out/ from the VS "Open Folder" mode)
+/build/
+/out/
+
+# Working directory the app runs from; holds generated results and imgui.ini
+/run/
+
+# Local Chrono_DIR override -- start from CMakeUserPresets.json.example
+CMakeUserPresets.json

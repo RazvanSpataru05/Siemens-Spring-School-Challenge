@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "local",
+      "inherits": "windows-x64",
+      "cacheVariables": {
+        "Chrono_DIR": "C:/path/to/chrono-build/cmake"
+      }
+    }
+  ]
+}

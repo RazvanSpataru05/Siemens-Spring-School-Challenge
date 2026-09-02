@@ -1,250 +1,143 @@
 #--------------------------------------------------------------
-# 
-# Example of CMake configuration file to build an external 
-# project depending on Chrono and on optional Chrono modules.
-# 
-# This minimal sample project can be used as a template for a
-# user project.  Modify sections 1, 2, and 3 below as appropriate.
-# 
-#--------------------------------------------------------------
-
-cmake_minimum_required(VERSION 3.10)
-
-#--------------------------------------------------------------
-# === 1 === 
-# Modify the project name if you want: 
-#--------------------------------------------------------------
-
-project(ChronoProject_FinalGA)
-
-#--------------------------------------------------------------
-# === 2 ===
-# Find the Chrono package and any REQUIRED or OPTIONAL modules
-# by invoking the find_package function in CONFIG mode:
-#    find_package(Chrono
-#	              COMPONENTS req_module1 req_module1 ...
-#	              OPTIONAL opt_module1 opt_module2 ...
-#                 CONFIG)
-# The following Chrono modules can be requested (their names
-# are case insensitive): Cascade, Cosimulation, FEA, Irrlicht,
-# Matlab, Parallel, Postprocess, Python, Vehicle.
-# 
-# Note that you will have to set the variable Chrono_DIR to 
-# specify the location of the ChronoConfig.cmake script, if
-# it is not in its default install location.
-# Chrono_DIR can be either a Chrono build tree or a Chrono install tree.
-# 
-# The following variables are set and can be used further down:
-# CHRONO_FOUND
-#   set to true if Chrono and all required components were found
-# CHRONO_C_FLAGS
-# CHRONO_CXX_FLAGS
-#   C and C++ compilation flags
-# CHRONO_INCLUDE_DIRS
-#   additional paths for included headers
-# CHRONO_LIBRARIES
-#   list of required libraries (with full path)
-# CHRONO_LINKER_FLAGS
-#   additional linker flags
-# CHRONO_DLLS
-#   list of all DLL dependencies (with full path)
-# CHRONO_DATA_DIR
-#   path to the Chrono data make_directory
-# 
-# In addition, for each requested component [COMPONENT], the
-# following variable is set to true (ON) or false (OFF):
-# CHRONO_[COMPONENT]_FOUND
-# 
-# In this example, we only request the Irrlicht module (required)
-#--------------------------------------------------------------
-
-find_package(Chrono
-             COMPONENTS Irrlicht
-             CONFIG)
-
-find_package(Chrono
-             COMPONENTS Irrlicht Postprocessing
-             CONFIG)
-
-#--------------------------------------------------------------
-# Return now if Chrono or a required component was not found.
-#--------------------------------------------------------------
-
-if (NOT Chrono_FOUND)
-  message( FATAL_ERROR "Could not find Chrono or one of its required modules")
-  SET(Chrono_DIR "${ChronoProject_FinalGA_SOURCE_DIR}/../chrono_build/cmake")
-  LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/../Chrono/lib")
-endif()
-
-#--------------------------------------------------------------
-# Enable creation of "application bundles" on MacOSX.
-#--------------------------------------------------------------
-
-# This is necessary for any Irrlicht-based project (like the example here).
-# For OpenGL-based or non-graphics projects, this is optional and the block
-# below can be removed (or else explcitly set CMAKE_MACOSX_BUNDLE to 'OFF').
+# Structural optimization of a building using a genetic algorithm.
 #
-# If creating application bundles, the build output will be named 'myexe.app'.
-# Use the convenience script 'run_app.sh' available under 'contrib/appbundle-macosx/'
-# to run:
-#     start_demo.sh myexe.app
+# Built on Project Chrono (multibody dynamics) + Irrlicht (rendering)
+# + Dear ImGui (in-scene UI, DirectX 9 backend).
+#
+# Quick start:
+#   cmake -S . -B build -G "Visual Studio 17 2022" -A x64 ^
+#         -DChrono_DIR="<path>/chrono-build/cmake"
+#   cmake --build build --config Release
+#--------------------------------------------------------------
 
-if(APPLE)
-    set(CMAKE_MACOSX_BUNDLE ON)
+cmake_minimum_required(VERSION 3.16)
+
+project(ChronoProject_FinalGA LANGUAGES CXX)
+
+#--------------------------------------------------------------
+# Platform
+#
+# The ImGui integration talks to the Irrlicht device's underlying
+# IDirect3DDevice9 (see src/System/ConfigureSystem.cpp), so this
+# project only builds and runs on Windows.
+#--------------------------------------------------------------
+
+if(NOT WIN32)
+    message(FATAL_ERROR
+        "This project uses the Dear ImGui DirectX 9 backend and is Windows-only.")
 endif()
 
 #--------------------------------------------------------------
-# Add path to Chrono headers and to headers of all dependencies
-# of the requested modules.
+# Locate Project Chrono
+#
+# Chrono_DIR must point at the folder containing ChronoConfig.cmake,
+# which is either <chrono-build>/cmake or <chrono-install>/lib/cmake.
 #--------------------------------------------------------------
 
-include_directories(${CHRONO_INCLUDE_DIRS})
+find_package(Chrono COMPONENTS Irrlicht CONFIG)
+
+if(NOT Chrono_FOUND)
+    message(FATAL_ERROR
+        "Could not find Project Chrono (7.0.3) or its Irrlicht module.\n"
+        "Point Chrono_DIR at the folder holding ChronoConfig.cmake, e.g.\n"
+        "  cmake -S . -B build -DChrono_DIR=\"C:/path/to/chrono-build/cmake\"")
+endif()
+
+# ChronoConfig.cmake bakes in absolute paths recorded when Chrono was
+# configured. Moving the Chrono source or build tree afterwards leaves those
+# paths dangling, and find_package still reports success -- the failure only
+# shows up later as a wall of "cannot open include file". Catch it here.
+list(GET CHRONO_INCLUDE_DIRS 0 CHRONO_FIRST_INCLUDE_DIR)
+if(NOT EXISTS "${CHRONO_FIRST_INCLUDE_DIR}")
+    message(FATAL_ERROR
+        "Chrono was found at ${Chrono_DIR}, but the include path it records "
+        "does not exist:\n"
+        "  ${CHRONO_FIRST_INCLUDE_DIR}\n"
+        "This means the Chrono source/build tree was moved after it was "
+        "configured. Either re-run CMake on the Chrono tree in its current "
+        "location, or update the absolute paths inside ChronoConfig.cmake.")
+endif()
 
 #--------------------------------------------------------------
-# Tweaks to disable some warnings with MSVC
+# Target
 #--------------------------------------------------------------
+
+file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/inc/*.h")
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
+
+add_executable(${PROJECT_NAME} ${PROJECT_HEADERS} ${PROJECT_SOURCES})
+
+# Mirror the on-disk folder layout in the Visual Studio solution explorer.
+source_group(TREE "${PROJECT_SOURCE_DIR}" FILES ${PROJECT_HEADERS} ${PROJECT_SOURCES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${PROJECT_SOURCE_DIR}/inc"
+    ${CHRONO_INCLUDE_DIRS})
+
+# Requires C++20.
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    CHRONO_DATA_DIR="${CHRONO_DATA_DIR}")
+
 if(MSVC)
-    add_definitions("-D_CRT_SECURE_NO_DEPRECATE")  # avoids deprecation warnings
-    add_definitions("-D_SCL_SECURE_NO_DEPRECATE")  # avoids deprecation warnings
-    add_definitions( "-DNOMINMAX" )                # do not use MSVC's min/max macros
-    set(EXTRA_COMPILE_FLAGS "/wd4275")             # disable warnings triggered by Irrlicht
-else()
-    set(EXTRA_COMPILE_FLAGS "")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        _CRT_SECURE_NO_DEPRECATE   # Chrono/Irrlicht use "unsafe" CRT calls
+        _SCL_SECURE_NO_DEPRECATE
+        NOMINMAX)                  # keep min/max macros out of std::min/max
 endif()
 
+# Chrono's own flags (/arch:AVX2, OpenMP, /wd4275, ...) must match those the
+# Chrono libraries were compiled with.
+separate_arguments(CHRONO_CXX_FLAGS_LIST NATIVE_COMMAND "${CHRONO_CXX_FLAGS}")
+target_compile_options(${PROJECT_NAME} PRIVATE ${CHRONO_CXX_FLAGS_LIST})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    LINK_FLAGS "${CHRONO_LINKER_FLAGS}")
+
+# d3d9.lib backs the ImGui DirectX 9 backend.
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CHRONO_LIBRARIES} d3d9.lib)
+
 #--------------------------------------------------------------
-# === 3 ===
-# Add the executable from your project and specify all C++ 
-# files in your project. 
+# Runtime DLLs
+#
+# Copied next to the executable after every build, for whichever
+# configuration is being built. This works for both single-config
+# generators (Ninja) and multi-config ones (Visual Studio), unlike
+# Chrono's add_DLL_copy_command, which only handles Release.
 #--------------------------------------------------------------
 
-set(INCROOT ${PROJECT_SOURCE_DIR}/inc)
-set(SRCROOT ${PROJECT_SOURCE_DIR}/src)
+get_filename_component(CHRONO_ROOT "${Chrono_DIR}/.." ABSOLUTE)
 
-file(GLOB_RECURSE INCS 
-	"${INCROOT}/*.h"
-)
-file(GLOB_RECURSE SRCS 
-	"${SRCROOT}/*.cpp"
-)
+if(EXISTS "${CHRONO_ROOT}/bin/Release" OR EXISTS "${CHRONO_ROOT}/bin/Debug")
+    set(CHRONO_RUNTIME_DIR "${CHRONO_ROOT}/bin/$<CONFIG>")   # Chrono build tree
+else()
+    set(CHRONO_RUNTIME_DIR "${CHRONO_ROOT}/bin")             # Chrono install tree
+endif()
 
-ADD_EXECUTABLE(ChronoProject_FinalGA
-${INCS} 
-${SRCS}
-)   
+set(RUNTIME_DLLS Irrlicht.dll ${CHRONO_DLL_NAMES})
+list(REMOVE_DUPLICATES RUNTIME_DLLS)
 
-foreach(FILE ${SRCS}) 
-    # Get the directory of the source file
-    get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
-
-    # Remove common directory prefix to make the group
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
-
-    # Make sure we are using windows slashes
-    string(REPLACE "/" "\\" GROUP "${GROUP}")
-
-    # Group into "Source Files" and "Header Files"
-    if ("${FILE}" MATCHES ".*\\.cpp")
-       set(GROUP "${GROUP}")
-    elseif("${FILE}" MATCHES ".*\\.h")
-       set(GROUP "${GROUP}")
-    endif()
-
-    source_group("${GROUP}" FILES "${FILE}")
-endforeach()
-
-foreach(FILE ${INCS}) 
-    # Get the directory of the source file
-    get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
-
-    # Remove common directory prefix to make the group
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
-
-    # Make sure we are using windows slashes
-    string(REPLACE "/" "\\" GROUP "${GROUP}")
-
-    # Group into "Source Files" and "Header Files"
-    if ("${FILE}" MATCHES ".*\\.cpp")
-       set(GROUP "${GROUP}")
-    elseif("${FILE}" MATCHES ".*\\.h")
-       set(GROUP "${GROUP}")
-    endif()
-
-    source_group("${GROUP}" FILES "${FILE}")
+foreach(DLL IN LISTS RUNTIME_DLLS)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CHRONO_RUNTIME_DIR}/${DLL}"
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        COMMENT "Copying ${DLL} next to the executable")
 endforeach()
 
 #--------------------------------------------------------------
-# Set properties for your executable target
-# 
-# Note that here we define a macro CHRONO_DATA_DIR which will
-# contain the path to the Chrono data directory, either in its
-# source tree (if using a build version of Chrono), or in its
-# install tree (if using an installed version of Chrono).
+# Debugger working directory
+#
+# The app reads its inputs as "../initial_individual.txt" and
+# "../algorithm_settings.txt" (inc/Services/constants.h), so it has to run
+# from a directory one level below the repository root. run/ serves that
+# purpose and collects the generated final_individual.txt / *.csv output.
 #--------------------------------------------------------------
 
-set_target_properties(ChronoProject_FinalGA PROPERTIES 
-	    COMPILE_FLAGS "${CHRONO_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}"
-	    COMPILE_DEFINITIONS "CHRONO_DATA_DIR=\"${CHRONO_DATA_DIR}\""
-	    LINK_FLAGS "${CHRONO_LINKER_FLAGS}"
-		CXX_STANDARD 17)
+file(MAKE_DIRECTORY "${PROJECT_SOURCE_DIR}/run")
 
-#--------------------------------------------------------------
-# Link to Chrono libraries and dependency libraries
-#--------------------------------------------------------------
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/run")
 
-target_link_libraries(ChronoProject_FinalGA ${CHRONO_LIBRARIES} d3d9.lib)
-
-#--------------------------------------------------------------
-# === 4 (OPTIONAL) ===
-# 
-# Optionally, add a custom command for copying all Chrono and
-# dependency DLLs to the appropriate binary output folder.
-# This function has effect only on Windows.
-# 
-# Note that you must first set EXECUTABLE_OUTPUT_PATH
-# (this can simply be ${CMAKE_BINARY_DIR}, like in this example)
-#--------------------------------------------------------------
-
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-add_DLL_copy_command("${CHRONO_DLLS}")
-
-set (DEBUG_PATH ${ChronoProject_FinalGA_SOURCE_DIR}/build/Debug)
-set (CHRONO_DEBUG_PATH ${Chrono_DIR}/../bin/Debug)
-
-set (RELEASE_PATH ${ChronoProject_FinalGA_SOURCE_DIR}/build/Release)
-set (CHRONO_RELEASE_PATH ${Chrono_DIR}/../bin/Release)
-
-file(COPY
-   ${CHRONO_RELEASE_PATH}/ChronoEngine.dll
-   DESTINATION ${RELEASE_PATH})
-	
-file(COPY
-    ${CHRONO_RELEASE_PATH}/ChronoEngine_irrlicht.dll
-    DESTINATION ${RELEASE_PATH})
-	
-file(COPY
-    ${CHRONO_RELEASE_PATH}/ChronoEngine_postprocess.dll
-    DESTINATION ${RELEASE_PATH})
-	
-file(COPY
-    ${CHRONO_RELEASE_PATH}/Irrlicht.dll
-    DESTINATION ${RELEASE_PATH})
-	
-	
-file(COPY
-   ${CHRONO_DEBUG_PATH}/ChronoEngine.dll
-   DESTINATION ${DEBUG_PATH})
-	
-file(COPY
-    ${CHRONO_DEBUG_PATH}/ChronoEngine_irrlicht.dll
-    DESTINATION ${DEBUG_PATH})
-	
-#file(COPY
-#    ${CHRONO_DEBUG_PATH}/ChronoEngine_postprocess.dll
-#    DESTINATION ${DEBUG_PATH})
-	
-file(COPY
-    ${CHRONO_DEBUG_PATH}/Irrlicht.dll
-    DESTINATION ${DEBUG_PATH})
-
-include_directories(ChronoProject_FinalGA ${ChronoProject_FinalGA_SOURCE_DIR}/inc)
+set_property(DIRECTORY "${PROJECT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
