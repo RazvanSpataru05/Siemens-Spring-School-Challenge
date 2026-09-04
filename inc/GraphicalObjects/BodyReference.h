@@ -17,7 +17,7 @@ public:
 
 	~BodyReference() = default;
 
-	const std::shared_ptr<chrono::ChBody> GetBody() const;
+	const std::shared_ptr<chrono::ChBody>& GetBody() const;
 
 private:
 	std::shared_ptr<chrono::ChBody> m_body;

@@ -172,16 +172,6 @@ void GeneticAlgorithm::Mutation()
 	}
 }
 
-bool GeneticAlgorithm::IsGreaterThan(double value, double lowerBound) const
-{
-	return value > lowerBound;
-}
-
-bool GeneticAlgorithm::IsLessThanOrEqualTo(double value, double upperBound) const
-{
-	return value <= upperBound;
-}
-
 void GeneticAlgorithm::WriteWinners(int epoch)
 {
 	IIndividual* winner = GetWinnerIndividual();

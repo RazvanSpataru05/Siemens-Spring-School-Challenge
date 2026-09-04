@@ -28,26 +28,26 @@ public:
 	const double GetDensity() const;
 
 private:
-	
+
 	AlgorithmSettings();
 
 	static AlgorithmSettings* m_instance;
 
-	int m_numbeOfEpochs;
-	int m_numberOfIndividuals;
+	int m_numberOfEpochs{ 5 };
+	int m_numberOfIndividuals{ 50 };
 
-	int m_oxSize;
-	int m_oySize;
-	int m_ozSize;
+	int m_oxSize{ 10 };
+	int m_oySize{ 3 };
+	int m_ozSize{ 3 };
 
-	double m_elementSize;
+	double m_elementSize{ 0.1 };
 
-	double m_crossoverProbability;
-	double m_mutationProbability;
+	double m_crossoverProbability{ 0.5 };
+	double m_mutationProbability{ 0.01 };
 
-	double m_maximumStress;
+	double m_maximumStress{ 4.5e+08 };
 
-	double m_youngModulus;
-	double m_poissonRatio;
-	double m_density;
+	double m_youngModulus{ 1e+21 };
+	double m_poissonRatio{ 0.3 };
+	double m_density{ 7800 };
 };

@@ -45,11 +45,6 @@ void GeneticAlgorithmService::RunWithCustomFirstIndividual(std::unique_ptr<Selec
 	geneticAlgorithm.Run();
 }
 
-void GeneticAlgorithmService::ShowResults()
-{
-	IOIndividualManager::ReadIndividualsDetailsAndCreateBuildings();
-}
-
 std::vector<std::shared_ptr<Building>> GeneticAlgorithmService::ShowResults
 (const std::vector<std::vector<bool>>& bestEpochIndividual)
 {
@@ -84,19 +79,16 @@ std::vector<double> GeneticAlgorithmService::CalcutateCumulativeProbabilityOfSel
 	const std::vector<std::shared_ptr<IIndividual>>& workingPopulation, const std::map<IIndividual*, double> fitnessValues)
 {
 	std::vector<double> cumulativeProbabilityOfSelectionVector;
-	std::vector<double> probabilityOfSelectionVector = CalculateProbabilityOfSelection(workingPopulation, fitnessValues);
+	cumulativeProbabilityOfSelectionVector.reserve(workingPopulation.size());
 
-	for (int currentIndividualIndex = 0; currentIndividualIndex < workingPopulation.size(); ++currentIndividualIndex)
+	std::vector<double> probabilityOfSelectionVector =
+		CalculateProbabilityOfSelection(workingPopulation, fitnessValues);
+
+	double probability{};
+	for (const double individualProbability : probabilityOfSelectionVector)
 	{
-		double probability{};
-
-		for (int index = 0; index <= currentIndividualIndex; ++index)
-		{
-			probability += probabilityOfSelectionVector[index];
-		}
-
+		probability += individualProbability;
 		cumulativeProbabilityOfSelectionVector.emplace_back(probability);
 	}
-
 	return cumulativeProbabilityOfSelectionVector;
 }

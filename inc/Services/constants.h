@@ -2,9 +2,6 @@
 
 #include <string>
 
-const std::string TXT_FILE_EXTENSION = std::string(".txt");
-const std::string CSV_FILE_EXTENSION = std::string(".csv");
-
 const std::string FILE_NAME_INITIAL_INDIVIDUAL = std::string("../initial_individual.txt");
 
 const std::string FILE_NAME_INDIVIDUAL = std::string("final_individual.txt");

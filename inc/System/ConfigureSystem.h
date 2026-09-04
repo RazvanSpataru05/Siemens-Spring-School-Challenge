@@ -71,9 +71,9 @@ private:
 
 	std::function<void(const GAConfig&)> m_onStartGA;
 	std::function<void(int)> m_onEpochChange;
-	int m_currentEpochIndex = 0;
-	int m_epochCount = 0;
-	int m_bestFitnessEpochIndex = -1;
+	int m_currentEpochIndex{ 0 };
+	int m_epochCount{ 0 };
+	int m_bestFitnessEpochIndex{ -1 };
 	std::atomic<bool> m_shouldClose{ false };
 
 	std::vector<int> m_removedElementsPerEpoch;

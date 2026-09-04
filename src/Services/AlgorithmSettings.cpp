@@ -11,7 +11,7 @@ AlgorithmSettings* AlgorithmSettings::GetInstance()
 
 const int AlgorithmSettings::GetNumberOfEpochs() const
 {
-	return m_numbeOfEpochs;
+	return m_numberOfEpochs;
 }
 
 const int AlgorithmSettings::GetNumberOfIndividuals() const
@@ -86,7 +86,7 @@ AlgorithmSettings::AlgorithmSettings()
 
 			if (variable == "NUMBER_OF_EPOCHS")
 			{
-				m_numbeOfEpochs = atoi(value.c_str());
+				m_numberOfEpochs = atoi(value.c_str());
 			}
 			else if (variable == "NUMBER_OF_INDIVIDUALS")
 			{

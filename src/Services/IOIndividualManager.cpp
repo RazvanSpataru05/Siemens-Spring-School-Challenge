@@ -20,44 +20,6 @@ const std::vector<std::vector<bool>>& bestEpochIndividual)
 	return result;
 }
 
-void IOIndividualManager::ReadIndividualsDetailsAndCreateBuildings()
-{
-	std::ifstream file;
-
-	std::shared_ptr<Building> readBuilding = nullptr;
-
-	file.open(FILE_NAME_INDIVIDUAL, std::ios::in);
-	if (file.is_open())
-	{
-		int sizeOx, sizeOy, sizeOz;
-		double elementSize;
-		bool cubeExistence;
-		std::vector<bool> cubesExistence;
-
-		while (!file.eof())
-		{
-			file >> sizeOx >> sizeOy >> sizeOz >> elementSize;
-
-			for (int index = 0; index < sizeOx * sizeOy * sizeOz; ++index)
-			{
-				file >> cubeExistence;
-				cubesExistence.emplace_back(cubeExistence);
-			}
-
-			readBuilding = Individual::CreateBuildingFromDetails(sizeOx, sizeOy, sizeOz, elementSize, cubesExistence);
-			Scene scene;
-			scene.ShowInitialBuilding(readBuilding);
-
-			cubesExistence.clear();
-		}
-		file.close();
-	}
-	else
-	{
-		std::cerr << "Could not open " + FILE_NAME_INDIVIDUAL + " file!";
-	}
-}
-
 std::vector<bool> IOIndividualManager::ReadInitialIndividual(int individualSize)
 {
 	std::ifstream file;

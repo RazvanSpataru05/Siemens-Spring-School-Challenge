@@ -34,7 +34,7 @@ BodyReference& BodyReference::operator=(BodyReference&& another) noexcept
 	return *this;
 }
 
-const std::shared_ptr<chrono::ChBody> BodyReference::GetBody() const
+const std::shared_ptr<chrono::ChBody>& BodyReference::GetBody() const
 {
 	return m_body;
 }

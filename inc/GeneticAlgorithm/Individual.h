@@ -36,7 +36,7 @@ public:
 
 	~Individual() = default;
 
-	const std::shared_ptr<Building> GetBuilding() const;
+	const std::shared_ptr<Building>& GetBuilding() const;
 	int GetNumberOfRemovedElements() const;
 	int GetNumberOfRemovedElementsWithoutInitialGene() const;
 	double GetCurrentMaxStress() const;
@@ -49,8 +49,6 @@ public:
 	double Evaluate() override;
 
 	void Mutation(double mutationProbability) override;
-
-	bool operator==(const Individual& other) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Individual& individual);
 

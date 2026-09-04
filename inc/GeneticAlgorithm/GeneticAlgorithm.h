@@ -63,9 +63,6 @@ private:
 	void Crossover();
 	void Mutation();
 
-	bool IsGreaterThan(double value, double lowerBound) const;
-	bool IsLessThanOrEqualTo(double value, double upperBound) const;
-
 	void WriteWinners(int epoch);
 
 private:

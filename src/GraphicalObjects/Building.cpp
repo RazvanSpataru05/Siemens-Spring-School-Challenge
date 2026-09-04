@@ -55,17 +55,17 @@ Building& Building::operator=(Building&& another) noexcept
 	return *this;
 }
 
-const std::shared_ptr<chrono::fea::ChMesh> Building::GetMesh() const
+const std::shared_ptr<chrono::fea::ChMesh>& Building::GetMesh() const
 {
 	return m_mesh;
 }
 
-const std::vector<bool> Building::GetCubesExistence() const
+const std::vector<bool>& Building::GetCubesExistence() const
 {
 	return m_cubesExistence;
 }
 
-const std::shared_ptr<chrono::ChSystemSMC> Building::GetSystem() const
+const std::shared_ptr<chrono::ChSystemSMC>& Building::GetSystem() const
 {
 	return m_system;
 }
@@ -193,7 +193,7 @@ void Building::EliminateCubesBasedOnCubesExistence(const std::vector<bool>& impo
 	std::vector<std::shared_ptr<chrono::fea::ChElementBase>> newElements = elements;
 	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>> newNodes = nodes;
 
-	for (uint16_t index = 0; index < importance.size(); ++index)
+	for (size_t index = 0; index < importance.size(); ++index)
 	{
 		if (!importance[index] && m_cubesExistence[index])
 		{
@@ -239,7 +239,7 @@ void Building::AddCubesBasedOnCubesExistence(const std::vector<bool>& importance
 	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAxyz>> nodesLeftSide;
 	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAxyz>> nodesRightSide;
 
-	for (uint16_t index = 0; index < importance.size(); ++index)
+	for (size_t index = 0; index < importance.size(); ++index)
 	{
 		if (importance[index] && !m_cubesExistence[index])
 		{
@@ -316,7 +316,7 @@ bool Building::AreNodesEqual(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& l
 
 bool Building::NodeAlreadyExistsInMesh(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node)
 {
-	for (uint16_t indexNode = 0; indexNode < m_mesh->GetNnodes(); ++indexNode)
+	for (size_t indexNode = 0; indexNode < m_mesh->GetNnodes(); ++indexNode)
 	{
 		if (auto existentNode = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(m_mesh->GetNode(indexNode)))
 		{
@@ -383,7 +383,7 @@ bool Building::HasAddedElementNeighbors(int position, const std::vector<bool>& i
 int Building::GetNodePositionInVector(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node,
 	const std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>>& nodes)
 {
-	for (uint16_t indexNode = 0; indexNode < nodes.size(); ++indexNode)
+	for (size_t indexNode = 0; indexNode < nodes.size(); ++indexNode)
 	{
 		if (auto existentNode = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(nodes[indexNode]))
 		{

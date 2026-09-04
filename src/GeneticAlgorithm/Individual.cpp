@@ -72,7 +72,7 @@ Individual& Individual::operator=(Individual&& another) noexcept
 	return *this;
 }
 
-const std::shared_ptr<Building> Individual::GetBuilding() const
+const std::shared_ptr<Building>& Individual::GetBuilding() const
 {
 	return m_building;
 }
@@ -135,20 +135,6 @@ void Individual::Mutation(double mutationProbability)
 
 	m_building->EliminateCubesBasedOnCubesExistence(newCubesExistence);
 	m_building->AddCubesBasedOnCubesExistence(newCubesExistence);
-}
-
-bool Individual::operator==(const Individual& other) const
-{
-	for (int index = 0; index < m_building->GetCubesExistence().size(); ++index)
-		if (m_building->GetCubesExistence()[index] != other.m_building->GetCubesExistence()[index])
-			return false;
-
-	return
-		m_sizeOx == other.m_sizeOx &&
-		m_sizeOy == other.m_sizeOy &&
-		m_sizeOz == other.m_sizeOz &&
-		m_elementSize == other.m_elementSize &&
-		m_maximStress == other.m_maximStress;
 }
 
 std::shared_ptr<Building> Individual::CreateBuildingFromDetails(int sizeOx, int sizeOy, int sizeOz,
