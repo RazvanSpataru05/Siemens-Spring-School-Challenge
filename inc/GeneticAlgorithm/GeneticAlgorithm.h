@@ -1,9 +1,12 @@
 #pragma once
 
+#include <algorithm>
 #include <future>
 #include <functional>
 #include <iostream>
 #include <map>
+#include <thread>
+#include <unordered_set>
 
 #include <GeneticAlgorithm/IIndividual.h>
 

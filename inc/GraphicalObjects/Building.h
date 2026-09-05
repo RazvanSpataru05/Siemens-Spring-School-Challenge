@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <fea/ChMesh.h>
 
@@ -51,21 +53,25 @@ private:
 		const std::shared_ptr<chrono::ChBody>& base);
 	void EliminateConstaints();
 
-	int GetNodePositionInVector(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node,
-		const std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>>& nodes);
-	int GetElementPositionFromImportanceVector(int position);
-
 	bool NodeAlreadyExistsInMesh(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node);
-	bool ExistsAnotherElementWithNode(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node,
-		const std::vector<std::shared_ptr<chrono::fea::ChElementBase>>& elements);
 
 	bool HasAddedElementNeighbors(int position, const std::vector<bool>& importance);
 
-	bool AreNodesEqual(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& lhsNode, 
-		const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& rhsNode);
+	// Node coordinates are always integer multiples of m_cubeSize, so quantising by that
+	// step turns a position into an exact lattice index. Packing the three indices into
+	// one integer gives a hashable identity for a node, which replaces the linear scans
+	// with exact float comparisons that used to dominate mesh edits.
+	int64_t NodeKey(const chrono::ChVector<>& position) const;
+	int64_t CellKey(size_t cellIndex) const;
 
 private:
 	std::shared_ptr<chrono::fea::ChMesh> m_mesh;
+
+	// Mirrors the set of nodes currently in m_mesh, so NodeAlreadyExistsInMesh is O(1).
+	std::unordered_set<int64_t> m_meshNodeKeys;
+
+	// Every element shares the same properties; build it once instead of per element.
+	std::shared_ptr<chrono::fea::ChContinuumElastic> m_material;
 
 	uint16_t m_numberOfCubesOx;
 	uint16_t m_numberOfCubesOy;

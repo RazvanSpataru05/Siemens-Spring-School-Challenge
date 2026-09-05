@@ -1,6 +1,7 @@
 #include <GraphicalObjects/Building.h>
 
-Building::Building(uint16_t numberOfCubesOx, uint16_t numberOfCubesOy, uint16_t numberOfCubesOz, double cubeSize) :
+Building::Building(uint16_t numberOfCubesOx, uint16_t numberOfCubesOy, uint16_t numberOfCubesOz,
+	double cubeSize) :
 	m_numberOfCubesOx{ numberOfCubesOx },
 	m_numberOfCubesOy{ numberOfCubesOy },
 	m_numberOfCubesOz{ numberOfCubesOz },
@@ -10,6 +11,7 @@ Building::Building(uint16_t numberOfCubesOx, uint16_t numberOfCubesOy, uint16_t 
 	m_cubesExistence = std::vector<bool>(m_numberOfCubesOx * m_numberOfCubesOy * m_numberOfCubesOz, true);
 	m_base = BodyReference();
 	m_system = std::make_shared<chrono::ChSystemSMC>();
+	m_material = ObjectProperties::SetMaterial();
 }
 
 Building::Building(const Building& another)
@@ -29,6 +31,8 @@ Building& Building::operator=(const Building& another)
 		m_base = another.m_base;
 		m_system = another.m_system;
 		m_mesh = another.m_mesh;
+		m_meshNodeKeys = another.m_meshNodeKeys;
+		m_material = another.m_material;
 		m_cubesExistence = another.m_cubesExistence;
 		m_cubeSize = another.m_cubeSize;
 		m_numberOfCubesOx = another.m_numberOfCubesOx;
@@ -46,6 +50,8 @@ Building& Building::operator=(Building&& another) noexcept
 		m_base = std::exchange(another.m_base, BodyReference());
 		m_system = std::exchange(another.m_system, nullptr);
 		m_mesh = std::exchange(another.m_mesh, nullptr);
+		m_meshNodeKeys = std::exchange(another.m_meshNodeKeys, {});
+		m_material = std::exchange(another.m_material, nullptr);
 		m_cubesExistence = std::exchange(another.m_cubesExistence, std::vector<bool>());
 		m_cubeSize = std::exchange(another.m_cubeSize, resetValue);
 		m_numberOfCubesOx = std::exchange(another.m_numberOfCubesOx, resetValue);
@@ -89,12 +95,10 @@ void Building::Build()
 					BuildCube(nodesLeftSide, nodesRightSide);
 				}
 
-				nodesLeftSide.clear();
-				std::copy(nodesRightSide.begin(), nodesRightSide.end(), std::back_inserter(nodesLeftSide));
+				nodesLeftSide = nodesRightSide;
 			}
 		}
 	}
-
 	m_system->Add(m_mesh);
 }
 
@@ -102,7 +106,7 @@ void Building::AddNodesInMesh(const std::vector<std::shared_ptr<chrono::fea::ChN
 {
 	for (const auto& node : nodes)
 	{
-		if (!NodeAlreadyExistsInMesh(node))
+		if (m_meshNodeKeys.insert(NodeKey(node->GetPos())).second)
 		{
 			m_mesh->AddNode(node);
 		}
@@ -116,7 +120,7 @@ void Building::BuildCube(const std::vector<std::shared_ptr<chrono::fea::ChNodeFE
 
 	element->SetNodes(nodesLeftSide[0], nodesLeftSide[1], nodesLeftSide[2], nodesLeftSide[3],
 		nodesRightSide[0], nodesRightSide[1], nodesRightSide[2], nodesRightSide[3]);
-	element->SetMaterial(ObjectProperties::SetMaterial());
+	element->SetMaterial(m_material);
 
 	m_mesh->AddElement(element);
 }
@@ -142,7 +146,7 @@ void Building::AddConstraints()
 {
 	m_system->Add(m_base.GetBody());
 
-	for (uint16_t inode = 0; inode < m_mesh->GetNnodes(); ++inode)
+	for (size_t inode = 0; inode < m_mesh->GetNnodes(); ++inode)
 	{
 		if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(m_mesh->GetNode(inode)))
 		{
@@ -172,13 +176,14 @@ void Building::EliminateConstaints()
 {
 	std::vector<std::shared_ptr<chrono::ChLinkBase>> constraints = m_system->Get_linklist();
 
-	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>> nodes = m_mesh->GetNodes();
-
 	for (const auto& constraint : constraints)
 	{
-		auto constraintNode = std::dynamic_pointer_cast<chrono::fea::ChLinkPointFrame>(constraint)->GetConstrainedNode();
+		auto pointFrame = std::dynamic_pointer_cast<chrono::fea::ChLinkPointFrame>(constraint);
+		if (!pointFrame) continue;
 
-		if (!NodeAlreadyExistsInMesh(constraintNode))
+		auto constraintNode = pointFrame->GetConstrainedNode();
+
+		if (!constraintNode || !NodeAlreadyExistsInMesh(constraintNode))
 		{
 			m_system->RemoveLink(constraint);
 		}
@@ -187,48 +192,103 @@ void Building::EliminateConstaints()
 
 void Building::EliminateCubesBasedOnCubesExistence(const std::vector<bool>& importance)
 {
-	std::vector<std::shared_ptr<chrono::fea::ChElementBase>> elements = m_mesh->GetElements();
-	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>> nodes = m_mesh->GetNodes();
+	const std::vector<std::shared_ptr<chrono::fea::ChElementBase>> elements = m_mesh->GetElements();
+	const std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>> nodes = m_mesh->GetNodes();
 
-	std::vector<std::shared_ptr<chrono::fea::ChElementBase>> newElements = elements;
-	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>> newNodes = nodes;
+	std::unordered_map<int64_t, size_t> elementIndexByKey;
+	std::unordered_map<int64_t, int> elementsPerNode;
+	elementIndexByKey.reserve(elements.size());
+	elementsPerNode.reserve(nodes.size());
+
+	for (size_t elementIndex = 0; elementIndex < elements.size(); ++elementIndex)
+	{
+		const auto& element = elements[elementIndex];
+
+		for (size_t indexNode = 0; indexNode < element->GetNnodes(); ++indexNode)
+		{
+			if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(element->GetNodeN(indexNode)))
+			{
+				const int64_t key = NodeKey(node->GetPos());
+				++elementsPerNode[key];
+
+				if (indexNode == 0)
+				{
+					elementIndexByKey[key] = elementIndex;
+				}
+			}
+		}
+	}
+
+	std::unordered_map<int64_t, size_t> nodeIndexByKey;
+	nodeIndexByKey.reserve(nodes.size());
+
+	for (size_t indexNode = 0; indexNode < nodes.size(); ++indexNode)
+	{
+		if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(nodes[indexNode]))
+		{
+			nodeIndexByKey[NodeKey(node->GetPos())] = indexNode;
+		}
+	}
+
+	std::vector<bool> elementRemoved(elements.size(), false);
+	std::vector<bool> nodeRemoved(nodes.size(), false);
 
 	for (size_t index = 0; index < importance.size(); ++index)
 	{
-		if (!importance[index] && m_cubesExistence[index])
+		if (importance[index] || !m_cubesExistence[index]) continue;
+
+		m_cubesExistence[index] = false;
+
+		const auto elementEntry = elementIndexByKey.find(CellKey(index));
+		if (elementEntry == elementIndexByKey.end()) continue;
+
+		const size_t elementPosition = elementEntry->second;
+		if (elementRemoved[elementPosition]) continue;
+
+		elementRemoved[elementPosition] = true;
+
+		const auto& element = elements[elementPosition];
+
+		for (size_t indexNode = 0; indexNode < element->GetNnodes(); ++indexNode)
 		{
-			m_cubesExistence[index] = false;
-			int elementPosition = GetElementPositionFromImportanceVector(index);
-			for (uint16_t indexNode = 0; indexNode < elements[elementPosition]->GetNnodes(); ++indexNode)
+			if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(element->GetNodeN(indexNode)))
 			{
-				if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(elements[elementPosition]->GetNodeN(indexNode)))
+				const int64_t key = NodeKey(node->GetPos());
+
+				if (--elementsPerNode[key] > 0) continue;
+
+				const auto nodeEntry = nodeIndexByKey.find(key);
+				if (nodeEntry != nodeIndexByKey.end())
 				{
-					if (!ExistsAnotherElementWithNode(node, newElements))
-					{
-						int nodePosition = GetNodePositionInVector(node, newNodes);
-						if (nodePosition != -1)
-						{
-							newNodes.erase(newNodes.begin() + nodePosition);
-						}
-					}
+					nodeRemoved[nodeEntry->second] = true;
 				}
 			}
-
-			auto elementIterator = std::find(newElements.begin(), newElements.end(), elements[elementPosition]);
-			newElements.erase(elementIterator);
 		}
 	}
 
 	m_mesh->ClearNodes();
-	for (const auto& node : newNodes)
+	m_meshNodeKeys.clear();
+
+	for (size_t index = 0; index < nodes.size(); ++index)
 	{
-		m_mesh->AddNode(node);
+		if (nodeRemoved[index]) continue;
+
+		m_mesh->AddNode(nodes[index]);
+
+		if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(nodes[index]))
+		{
+			m_meshNodeKeys.insert(NodeKey(node->GetPos()));
+		}
 	}
 
 	m_mesh->ClearElements();
-	for (const auto& element : newElements)
+
+	for (size_t index = 0; index < elements.size(); ++index)
 	{
-		m_mesh->AddElement(element);
+		if (!elementRemoved[index])
+		{
+			m_mesh->AddElement(elements[index]);
+		}
 	}
 
 	EliminateConstaints();
@@ -270,87 +330,10 @@ void Building::AddCubesBasedOnCubesExistence(const std::vector<bool>& importance
 	}
 }
 
-int Building::GetElementPositionFromImportanceVector(int position)
-{
-	uint16_t layerOx = position % m_numberOfCubesOx;
-	uint16_t layerOy = position / (m_cubesExistence.size() / m_numberOfCubesOy);
-	uint16_t layerOz = (position / m_numberOfCubesOx) % m_numberOfCubesOz;
-
-	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAxyz>> nodesLeftSide = BuildLateralNodesForLayers(layerOx, layerOy, layerOz);
-	std::vector<std::shared_ptr<chrono::fea::ChNodeFEAxyz>> nodesRightSide = BuildLateralNodesForLayers(layerOx + 1, layerOy, layerOz);
-
-	nodesLeftSide.insert(nodesLeftSide.end(), nodesRightSide.begin(), nodesRightSide.end());
-
-	std::vector<std::shared_ptr<chrono::fea::ChElementBase>> elements = m_mesh->GetElements();
-
-	for (int index = 0; index < m_mesh->GetNelements(); ++index)
-	{
-		bool areNodesTheSame = true;
-		for (uint16_t indexNode = 0; indexNode < elements[index]->GetNnodes(); ++indexNode)
-		{
-			if (auto node = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(elements[index]->GetNodeN(indexNode)))
-			{
-				if (!AreNodesEqual(nodesLeftSide[indexNode], node)) {
-					areNodesTheSame = false;
-					break;
-				}
-			}
-		}
-		if (areNodesTheSame)
-			return index;
-	}
-	return -1;
-}
-
-bool Building::AreNodesEqual(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& lhsNode,
-	const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& rhsNode)
-{
-	if (lhsNode->GetPos().x() == rhsNode->GetPos().x() &&
-		lhsNode->GetPos().y() == rhsNode->GetPos().y() &&
-		lhsNode->GetPos().z() == rhsNode->GetPos().z())
-
-		return true;
-
-	return false;
-}
-
 bool Building::NodeAlreadyExistsInMesh(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node)
 {
-	for (size_t indexNode = 0; indexNode < m_mesh->GetNnodes(); ++indexNode)
-	{
-		if (auto existentNode = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(m_mesh->GetNode(indexNode)))
-		{
-			if (AreNodesEqual(existentNode, node))
-				return true;
-		}
-	}
-
-	return false;
+	return m_meshNodeKeys.find(NodeKey(node->GetPos())) != m_meshNodeKeys.end();
 }
-
-bool Building::ExistsAnotherElementWithNode(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node,
-	const std::vector<std::shared_ptr<chrono::fea::ChElementBase>>& elements)
-{
-	int numberOfElements = 0;
-
-	for (const auto& element : elements)
-	{
-		for (uint16_t indexNode = 0; indexNode < element->GetNnodes(); ++indexNode)
-		{
-			if (auto elementNode = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(element->GetNodeN(indexNode)))
-			{
-				if (AreNodesEqual(node, elementNode))
-				{
-					++numberOfElements;
-					if (numberOfElements > 1)
-						return true;
-				}
-			}
-		}
-	}
-	return false;
-}
-
 bool Building::HasAddedElementNeighbors(int position, const std::vector<bool>& importance)
 {
 	if (position + 1 < importance.size())
@@ -380,18 +363,23 @@ bool Building::HasAddedElementNeighbors(int position, const std::vector<bool>& i
 	return false;
 }
 
-int Building::GetNodePositionInVector(const std::shared_ptr<chrono::fea::ChNodeFEAxyz>& node,
-	const std::vector<std::shared_ptr<chrono::fea::ChNodeFEAbase>>& nodes)
+int64_t Building::NodeKey(const chrono::ChVector<>& position) const
 {
-	for (size_t indexNode = 0; indexNode < nodes.size(); ++indexNode)
-	{
-		if (auto existentNode = std::dynamic_pointer_cast<chrono::fea::ChNodeFEAxyz>(nodes[indexNode]))
-		{
-			if (AreNodesEqual(existentNode, node))
-			{
-				return indexNode;
-			}
-		}
-	}
-	return -1;
+	static constexpr int64_t K_KEY_OFFSET = 1 << 20;
+	static constexpr int K_KEY_BITS = 21;
+
+	const int64_t x = std::llround(position.x() / m_cubeSize) + K_KEY_OFFSET;
+	const int64_t y = std::llround(position.y() / m_cubeSize) + K_KEY_OFFSET;
+	const int64_t z = std::llround(position.z() / m_cubeSize) + K_KEY_OFFSET;
+
+	return (x << (2 * K_KEY_BITS)) | (y << K_KEY_BITS) | z;
+}
+
+int64_t Building::CellKey(size_t cellIndex) const
+{
+	const uint16_t layerOx = static_cast<uint16_t>(cellIndex % m_numberOfCubesOx);
+	const uint16_t layerOy = static_cast<uint16_t>(cellIndex / (m_cubesExistence.size() / m_numberOfCubesOy));
+	const uint16_t layerOz = static_cast<uint16_t>((cellIndex / m_numberOfCubesOx) % m_numberOfCubesOz);
+
+	return NodeKey(chrono::ChVector<>(layerOx * m_cubeSize, layerOy * m_cubeSize, layerOz * m_cubeSize));
 }
