@@ -12,10 +12,10 @@
 #include "GeneticAlgorithm/UtilFunctions.h"
 #include "GeneticAlgorithm/GeneticAlgorithm.h"
 
-class GAApplication
+class Application
 {
 public:
-	GAApplication();
+	explicit Application();
 
 	void Run();
 

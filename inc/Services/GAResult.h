@@ -1,8 +1,8 @@
 #pragma once
-#include "GraphicalObjects/Building.h"
+#include <vector>
 
 struct GAResult
 {
-	std::vector<std::shared_ptr<Building>> epochBuildings;
+	std::vector<std::vector<bool>> epochGenes;
 	int bestFitnessEpochIndex{};
 };

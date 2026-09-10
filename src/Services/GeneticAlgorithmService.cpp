@@ -45,12 +45,6 @@ void GeneticAlgorithmService::RunWithCustomFirstIndividual(std::unique_ptr<Selec
 	geneticAlgorithm.Run();
 }
 
-std::vector<std::shared_ptr<Building>> GeneticAlgorithmService::ShowResults
-(const std::vector<std::vector<bool>>& bestEpochIndividual)
-{
-	return IOIndividualManager::CreateAllBuildings(bestEpochIndividual);
-}
-
 double GeneticAlgorithmService::CalculateSumOfFitnessValues(const std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 	const std::map<IIndividual*, double> fitnessValues)
 {

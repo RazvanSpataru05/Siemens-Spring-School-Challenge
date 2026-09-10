@@ -1,10 +1,8 @@
-#include <Services/GAApplication.h>
+#include <Services/Application.h>
 
-int main(int argc, char* argv[])
+int main()
 {
 	chrono::SetChronoDataPath(CHRONO_DATA_DIR);
-	GAApplication app{};
+	Application app{};
 	app.Run();
-
-	return 0;
 }

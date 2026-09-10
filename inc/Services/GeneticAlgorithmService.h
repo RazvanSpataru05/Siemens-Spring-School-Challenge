@@ -16,8 +16,6 @@ public:
 		std::unique_ptr<SelectionStrategy> selectionStrategy,
 		std::unique_ptr<CrossoverStrategy> crossoverStrategy);
 
-	static std::vector<std::shared_ptr<Building>> ShowResults(
-		const std::vector<std::vector<bool>>& bestEpochIndividual);
 
 	static double CalculateSumOfFitnessValues(
 		const std::vector<std::shared_ptr<IIndividual>>& workingPopulation,

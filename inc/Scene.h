@@ -18,7 +18,7 @@ public:
 
 	void SetOnStartGA(std::function<void(const GAConfig&)> callback);
 	void ShowInitialBuilding(const std::shared_ptr<Building>& building);
-	void ShowEpochResults(const std::vector<std::shared_ptr<Building>>& epochBuildings,
+	void ShowEpochResults(const std::vector<std::vector<bool>>& epochGenes,
 		int bestFitnessEpochIndex, int startEpochIndex = -1);
 	void RequestClose();
 	void Shutdown();
@@ -28,7 +28,7 @@ private:
 
 	void InitializeSystem(const std::shared_ptr<Building>& building, bool epochViewerMode = false);
 	void SetVisualizationProperties(const std::shared_ptr<Building>& building);
-	void LoadBuildingIntoHost(const std::shared_ptr<Building>& building);
+	void LoadBuildingIntoHost(const std::vector<bool>& cubesExistence);
 	void SwitchToEpoch(int epochIndex);
 
 private:
@@ -36,12 +36,12 @@ private:
 	std::unique_ptr<ConfigureSystem> m_configureSystem;
 	std::shared_ptr<chrono::ChSystemSMC> m_system;
 	std::function<void(const GAConfig&)> m_onStartGA;
-	std::vector<std::shared_ptr<Building>> m_epochBuildings;
+	std::vector<std::vector<bool>> m_epochGenes;
 
-	int m_currentEpochIndex = 0;
-	int m_bestFitnessEpochIndex = -1;
-	bool m_epochViewerMode = false;
-	bool m_initialized = false;
+	int m_currentEpochIndex{ 0 };
+	int m_bestFitnessEpochIndex{ -1 };
+	bool m_epochViewerMode{ false };
+	bool m_initialized{ false };
 
 	std::vector<int> m_cachedRemoved;
 	std::vector<double> m_cachedStress;

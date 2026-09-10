@@ -1,6 +1,6 @@
-#include <Services/GAApplication.h>
+#include <Services/Application.h>
 
-GAApplication::GAApplication()
+Application::Application()
 {
 	auto* settings = AlgorithmSettings::GetInstance();
 	m_oxSize = settings->GetOxSize();
@@ -15,7 +15,7 @@ GAApplication::GAApplication()
 	m_scene.SetOnStartGA([this](const GAConfig& config) {StartGA(config); });
 }
 
-void GAApplication::Run()
+void Application::Run()
 {
 	m_scene.ShowInitialBuilding(m_initialBuilding);
 
@@ -25,11 +25,14 @@ void GAApplication::Run()
 	{
 		m_scene.Shutdown();
 		m_scene.SetOnStartGA({});
-		m_scene.ShowEpochResults(m_result.epochBuildings, m_result.bestFitnessEpochIndex);
+		// Open the viewer already sitting on the best-scoring epoch, which is not
+		// necessarily the last one -- there is no elitism to carry it forward.
+		m_scene.ShowEpochResults(m_result.epochGenes,
+			m_result.bestFitnessEpochIndex, m_result.bestFitnessEpochIndex);
 	}
 }
 
-void GAApplication::StartGA(const GAConfig& config)
+void Application::StartGA(const GAConfig& config)
 {
 	if (m_gaRunning.load()) return;
 	if (m_gaThread.joinable()) m_gaThread.join();
@@ -52,7 +55,7 @@ void GAApplication::StartGA(const GAConfig& config)
 				ga.GetBestStressPerEpoch(),
 				ga.GetBestFitnessPerEpoch());
 
-			m_result.epochBuildings = GeneticAlgorithmService::ShowResults(ga.GetBestEpochIndividual());
+			m_result.epochGenes = ga.GetBestEpochIndividual();
 			m_result.bestFitnessEpochIndex = ga.GetBestFitnessEpochIndex();
 			m_hasResult = true;
 

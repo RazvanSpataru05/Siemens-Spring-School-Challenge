@@ -14,8 +14,6 @@
 class IOIndividualManager
 {
 public:
-	static std::vector<std::shared_ptr<Building>> CreateAllBuildings(
-		const std::vector<std::vector<bool>>& bestEpochIndividual);
 	static std::vector<bool> ReadInitialIndividual(int individualSize);
 
 	static void WriteIndividualDetailsInFile(IIndividual* individual);

@@ -1,25 +1,5 @@
 #include <Services/IOIndividualManager.h>
 
-std::vector<std::shared_ptr<Building>> IOIndividualManager::CreateAllBuildings(
-const std::vector<std::vector<bool>>& bestEpochIndividual)
-{
-	std::vector<std::shared_ptr<Building>> result;
-	
-	auto* settings = AlgorithmSettings::GetInstance();
-	int oxSize = settings->GetOxSize();
-	int oySize = settings->GetOySize();
-	int ozSize = settings->GetOzSize();
-	double elementSize = settings->GetElementSize();
-
-	for (const auto& cubesExistence : bestEpochIndividual)
-	{
-		auto building = Individual::CreateBuildingFromDetails(
-			oxSize, oySize, ozSize, elementSize, cubesExistence);
-		result.push_back(building);
-	}
-	return result;
-}
-
 std::vector<bool> IOIndividualManager::ReadInitialIndividual(int individualSize)
 {
 	std::ifstream file;

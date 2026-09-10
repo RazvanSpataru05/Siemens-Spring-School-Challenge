@@ -4,9 +4,7 @@
 #include <GeneticAlgorithm/Individual.h>
 #include <Services/AlgorithmSettings.h>
 
-Scene::Scene()
-{
-}
+Scene::Scene() {}
 
 void Scene::SetOnStartGA(std::function<void(const GAConfig&)> callback)
 {
@@ -32,6 +30,7 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 		L"Genetic Algorithm Configuration", irr::core::dimension2d<irr::u32>(screenWidth, screenHeight));
 	m_configureSystem = std::make_unique<ConfigureSystem>(m_application, m_system);
 	m_configureSystem->SetOnStartGA(m_onStartGA);
+
 	if (!m_cachedRemoved.empty())
 		m_configureSystem->SetEpochStats(m_cachedRemoved, m_cachedStress, m_cachedFitness);
 
@@ -39,28 +38,22 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	{
 		m_configureSystem->SetEpochNavigation(
 			m_currentEpochIndex,
-			static_cast<int>(m_epochBuildings.size()),
+			static_cast<int>(m_epochGenes.size()),
 			m_bestFitnessEpochIndex,
 			[this](int epochIndex) { SwitchToEpoch(epochIndex); });
 	}
 	m_configureSystem->ConfigureIrrllichtScene();
-	if (m_epochViewerMode)
-	{
-		LoadBuildingIntoHost(building);
-	}
-	else
-	{
-		m_configureSystem->InitializeIrrlichtScene();
-	}
+
+	if (m_epochViewerMode) LoadBuildingIntoHost(m_epochGenes[m_currentEpochIndex]);
+
+	else m_configureSystem->InitializeIrrlichtScene();
 
 	m_configureSystem->SetIrrlichtSceneTimestep(0.001);
 	m_configureSystem->SetSystemTimestepper();
 	m_configureSystem->SetSystemSolver();
 
-	if (!m_epochViewerMode)
-	{
-		m_configureSystem->Simulate(0.1);
-	}
+	if (!m_epochViewerMode) m_configureSystem->Simulate(0.1);
+	
 	m_configureSystem->RunIrrlichtScene();
 }
 
@@ -75,25 +68,23 @@ void Scene::ShowInitialBuilding(const std::shared_ptr<Building>& building)
 	}
 }
 
-void Scene::ShowEpochResults(const std::vector<std::shared_ptr<Building>>& epochBuildings,
+void Scene::ShowEpochResults(const std::vector<std::vector<bool>>& epochGenes,
 	int bestFitnessEpochIndex, int startEpochIndex)
 {
-	if (epochBuildings.empty()) return;
+	if (epochGenes.empty()) return;
 
-	m_epochBuildings = epochBuildings;
+	m_epochGenes = epochGenes;
 	m_bestFitnessEpochIndex = bestFitnessEpochIndex;
 	m_currentEpochIndex = startEpochIndex;
-	if (m_currentEpochIndex < 0 || m_currentEpochIndex >= static_cast<int>(m_epochBuildings.size()))
-	{
-		m_currentEpochIndex = static_cast<int>(m_epochBuildings.size()) - 1;
-	}
 
-	auto building = m_epochBuildings[m_currentEpochIndex];
-	SetVisualizationProperties(building);
+	if (m_currentEpochIndex < 0 || m_currentEpochIndex >= static_cast<int>(m_epochGenes.size()))
+	{
+		m_currentEpochIndex = static_cast<int>(m_epochGenes.size()) - 1;
+	}
 
 	if (!m_initialized)
 	{
-		InitializeSystem(building, true);
+		InitializeSystem(nullptr, true);
 		m_initialized = true;
 	}
 }
@@ -103,10 +94,12 @@ void Scene::SetEpochStats(std::vector<int> removed, std::vector<double> stress, 
 	m_cachedRemoved = std::move(removed);
 	m_cachedStress = std::move(stress);
 	m_cachedFitness = std::move(fitness);
-	if (m_configureSystem) m_configureSystem->SetEpochStats(m_cachedRemoved, m_cachedStress, m_cachedFitness);
+
+	if (m_configureSystem) 
+		m_configureSystem->SetEpochStats(m_cachedRemoved, m_cachedStress, m_cachedFitness);
 }
 
-void Scene::LoadBuildingIntoHost(const std::shared_ptr<Building>& building)
+void Scene::LoadBuildingIntoHost(const std::vector<bool>& cubesExistence)
 {
 	auto* settings = AlgorithmSettings::GetInstance();
 	auto displayBuilding = Individual::CreateBuildingFromDetails(
@@ -114,7 +107,7 @@ void Scene::LoadBuildingIntoHost(const std::shared_ptr<Building>& building)
 		settings->GetOySize(),
 		settings->GetOzSize(),
 		settings->GetElementSize(),
-		building->GetCubesExistence());
+		cubesExistence);
 
 	SetVisualizationProperties(displayBuilding);
 
@@ -142,16 +135,14 @@ void Scene::LoadBuildingIntoHost(const std::shared_ptr<Building>& building)
 
 void Scene::SwitchToEpoch(int epochIndex)
 {
-	if (!m_epochViewerMode || epochIndex < 0 || epochIndex >= static_cast<int>(m_epochBuildings.size()))
-	{
+	if (!m_epochViewerMode || epochIndex < 0 || epochIndex >= static_cast<int>(m_epochGenes.size()))
 		return;
-	}
 
 	m_currentEpochIndex = epochIndex;
-	LoadBuildingIntoHost(m_epochBuildings[m_currentEpochIndex]);
+	LoadBuildingIntoHost(m_epochGenes[m_currentEpochIndex]);
 	m_configureSystem->SetEpochNavigation(
 		m_currentEpochIndex,
-		static_cast<int>(m_epochBuildings.size()),
+		static_cast<int>(m_epochGenes.size()),
 		m_bestFitnessEpochIndex,
 		[this](int index) { SwitchToEpoch(index); });
 }
@@ -161,14 +152,16 @@ void Scene::Shutdown()
 	m_configureSystem.reset();
 	m_application.reset();
 	m_system.reset();
-	m_epochBuildings.clear();
+	m_epochGenes.clear();
 	m_epochViewerMode = false;
 	m_currentEpochIndex = 0;
 	m_bestFitnessEpochIndex = -1;
 	m_initialized = false;
 
 	MSG msg{};
-	while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {}
+
+	/* while block must not be deleted, as the app will no longer compile */
+	while (PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE)) {} 
 }
 
 void Scene::SetVisualizationProperties(const std::shared_ptr<Building>& building)
