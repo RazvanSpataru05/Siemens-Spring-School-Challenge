@@ -51,12 +51,12 @@ public:
 	void Run();
 
 	IIndividual* GetWinnerIndividual();
-	const std::vector<std::vector<bool>>& GetBestEpochIndividual() const;
-	const std::vector<int>& GetBestRemovedPerEpoch() const;
-	const std::vector<double>& GetBestStressPerEpoch() const;
-	const std::vector<double>& GetBestFitnessPerEpoch() const;
+	[[nodiscard]] const std::vector<std::vector<bool>>& GetBestEpochIndividual() const;
+	[[nodiscard]] const std::vector<int>& GetBestRemovedPerEpoch() const;
+	[[nodiscard]] const std::vector<double>& GetBestStressPerEpoch() const;
+	[[nodiscard]] const std::vector<double>& GetBestFitnessPerEpoch() const;
 	
-	int GetBestFitnessEpochIndex() const;
+	[[nodiscard]] int GetBestFitnessEpochIndex() const;
 
 private:
 	void InitializePopulation();
@@ -84,9 +84,9 @@ private:
 
 	std::map<IIndividual*, double> m_fitnessValues;
 
-	size_t m_populationSize;
-	size_t m_numberOfEpochs;
+	size_t m_populationSize{};
+	size_t m_numberOfEpochs{};
 
-	double m_crossoverProbability;
-	double m_mutationProbability;
+	double m_crossoverProbability{};
+	double m_mutationProbability{};
 };

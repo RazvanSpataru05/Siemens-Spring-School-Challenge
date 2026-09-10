@@ -1,4 +1,5 @@
 #pragma once
+
 #include <GeneticAlgorithm/IIndividual.h>
 
 class CrossoverStrategy

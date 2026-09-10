@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Services/SelectionStrategy.h"
 #include "Services/RandomNumbersGenerator.h"
 

@@ -40,7 +40,7 @@ void GeneticAlgorithm::Run()
 {
 	InitializePopulation();
 
-	for (int index = 0; index < m_numberOfEpochs; ++index)
+	for (size_t index = 0; index < m_numberOfEpochs; ++index)
 	{
 		std::cout << std::endl << "Epoch: " << index + 1 << std::endl;
 
@@ -63,7 +63,7 @@ int GeneticAlgorithm::GetBestFitnessEpochIndex() const
 {
 	if (m_bestFitnessPerEpoch.empty()) return 0;
 
-	int bestIndex = 0;
+	int bestIndex{};
 	double bestFitness = m_bestFitnessPerEpoch[0];
 
 	for (size_t index = 1; index < m_bestFitnessPerEpoch.size(); ++index)
@@ -79,7 +79,7 @@ int GeneticAlgorithm::GetBestFitnessEpochIndex() const
 
 IIndividual* GeneticAlgorithm::GetWinnerIndividual()
 {
-	double maxValue = 0.0;
+	double maxValue{};
 	IIndividual* winner = nullptr;
 
 	for (const auto value : m_fitnessValues)
@@ -126,10 +126,6 @@ void GeneticAlgorithm::InitializePopulation()
 
 void GeneticAlgorithm::CalculateFitnessValues()
 {
-	// Selection fills the working population with duplicate shared_ptrs, so the same
-	// Individual can appear many times. Evaluate each distinct one once: the simulation
-	// is deterministic, so the extra runs only cost time -- and they had two threads
-	// mutating one Individual at the same time.
 	std::vector<std::shared_ptr<IIndividual>> distinctIndividuals;
 	std::unordered_set<IIndividual*> alreadyQueued;
 	distinctIndividuals.reserve(m_workingPopulation.size());
@@ -142,14 +138,8 @@ void GeneticAlgorithm::CalculateFitnessValues()
 		}
 	}
 
-	// Every evaluation clones the whole Chrono system, so launching one task per
-	// individual would hold the population in memory several times over and
-	// oversubscribe the CPU. Keep at most one batch of them in flight.
 	size_t batchSize = std::thread::hardware_concurrency();
-	if (batchSize == 0)
-	{
-		batchSize = 4;
-	}
+	if (batchSize == 0) batchSize = 4;
 
 	for (size_t begin = 0; begin < distinctIndividuals.size(); begin += batchSize)
 	{
@@ -177,8 +167,6 @@ void GeneticAlgorithm::Crossover()
 	std::vector<std::shared_ptr<IIndividual>> selectedPopulationForCrossover;
 	std::vector<std::shared_ptr<IIndividual>> newPopulation;
 
-	// Selection can hand back fewer individuals than the configured population size,
-	// so size this off the working population rather than the configured count.
 	const size_t populationSize = m_workingPopulation.size();
 
 	std::vector<double> randomNumbers = RandomNumbersGenerator::GenerateRealNumbers(LOWER_BOUND, UPPER_BOUND, populationSize);
@@ -198,7 +186,8 @@ void GeneticAlgorithm::Crossover()
 
 	for (size_t index = 0; index < selectedPopulationForCrossover.size(); index += 2)
 	{
-		m_crossoverStrategy->Crossover(*selectedPopulationForCrossover[index], *selectedPopulationForCrossover[index + 1]);
+		m_crossoverStrategy->Crossover(*selectedPopulationForCrossover[index],
+			*selectedPopulationForCrossover[index + 1]);
 	}
 }
 
