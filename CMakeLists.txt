@@ -77,8 +77,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # Requires C++20.
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
+# PROJECT_DATA_DIR lets the app resolve algorithm_settings.txt, initial_individual.txt
+# and its generated output against the project directory, so it behaves the same
+# whichever working directory it is launched from. Trailing slash is required.
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    CHRONO_DATA_DIR="${CHRONO_DATA_DIR}")
+    CHRONO_DATA_DIR="${CHRONO_DATA_DIR}"
+    PROJECT_DATA_DIR="${PROJECT_SOURCE_DIR}/")
 
 if(MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -127,17 +131,15 @@ foreach(DLL IN LISTS RUNTIME_DLLS)
 endforeach()
 
 #--------------------------------------------------------------
-# Debugger working directory
+# Visual Studio conveniences
 #
-# The app reads its inputs as "../initial_individual.txt" and
-# "../algorithm_settings.txt" (inc/Services/constants.h), so it has to run
-# from a directory one level below the repository root. run/ serves that
-# purpose and collects the generated final_individual.txt / *.csv output.
+# Data files are addressed through PROJECT_DATA_DIR, so the working directory no
+# longer affects where they are read from or written to. It is still pointed at
+# the project directory so that anything the app writes relative to the working
+# directory (Dear ImGui's imgui.ini) lands somewhere predictable.
 #--------------------------------------------------------------
 
-file(MAKE_DIRECTORY "${PROJECT_SOURCE_DIR}/run")
-
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/run")
+    VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
 set_property(DIRECTORY "${PROJECT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})

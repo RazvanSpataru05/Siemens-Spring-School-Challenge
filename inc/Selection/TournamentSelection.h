@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Services/SelectionStrategy.h"
+#include "Selection/ISelectionStrategy.h"
+
 #include "Services/RandomNumbersGenerator.h"
 
-class TournamentSelection : public SelectionStrategy
+class TournamentSelection : public ISelectionStrategy
 {
 public:
 	TournamentSelection(int tournamentSize = 3);

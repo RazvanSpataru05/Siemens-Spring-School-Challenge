@@ -72,21 +72,19 @@ executable, so there is nothing to copy by hand.
 
 ### 3. Run
 
-Open `build/ChronoProject_FinalGA.sln` and press **F5** — the startup project and
-the debugger working directory are already set by CMake.
+Open `build/ChronoProject_FinalGA.sln` and press **F5** — CMake already sets the
+startup project.
 
-To run outside Visual Studio, launch the executable **from the `run/` folder**:
+Or launch the executable directly, from anywhere:
 
 ```bash
-cd run && ../build/Release/ChronoProject_FinalGA.exe
+build/Release/ChronoProject_FinalGA.exe
 ```
 
-The working directory matters: the app reads its inputs as `../algorithm_settings.txt`
-and `../initial_individual.txt`, so it must run from a directory one level below
-the repository root. `run/` exists for exactly that, and collects the generated
-`final_individual.txt` and `individual_values.csv`. Launching the `.exe` by
-double-clicking it will start with an empty structure, because those reads fail
-silently.
+The working directory does not matter. CMake compiles the project directory into
+the binary as `PROJECT_DATA_DIR`, and `algorithm_settings.txt`, `initial_individual.txt`
+and the generated `final_individual.txt` / `individual_values.csv` are all resolved
+against it, so the app reads and writes the same files however it is started.
 
 ---
 
@@ -170,8 +168,9 @@ on the Chrono tree where it now lives, or rewrite the stale prefix inside
 `ChronoConfig.cmake`.
 
 **The window opens but the structure is empty**
-The app was started from the wrong working directory and could not read
-`../initial_individual.txt`. See [Run](#3-run).
+`initial_individual.txt` could not be read, or holds fewer values than the grid
+needs. It must contain exactly `OX_SIZE * OY_SIZE * OZ_SIZE` values — short files
+fail silently and the missing cells are read as empty.
 
 **Missing `ChronoEngine.dll` / `Irrlicht.dll` at startup**
 The post-build copy step did not run, or you moved the `.exe` away from the DLLs

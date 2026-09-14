@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Services/SelectionStrategy.h>
-#include <Services/RandomNumbersGenerator.h>
-#include <Services/GeneticAlgorithmService.h>
+#include "Selection/ISelectionStrategy.h"
 
-class RouletteWheelSelection : public SelectionStrategy
+#include "Services/RandomNumbersGenerator.h"
+#include "Services/GeneticAlgorithmService.h"
+
+class RouletteWheelSelection : public ISelectionStrategy
 {
 public:
 	RouletteWheelSelection() = default;

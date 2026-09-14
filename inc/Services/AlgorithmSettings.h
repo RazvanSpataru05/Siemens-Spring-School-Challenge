@@ -5,8 +5,8 @@
 #include <algorithm>
 #include <memory>
 
+#include <Selection/ISelectionStrategy.h>
 #include <Services/constants.h>
-#include <Services/SelectionStrategy.h>
 
 class AlgorithmSettings
 {

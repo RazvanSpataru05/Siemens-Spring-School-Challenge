@@ -1,6 +1,8 @@
-#include <Services/GeneticAlgorithmService.h>
+#include "Services/GeneticAlgorithmService.h"
 
-void GeneticAlgorithmService::RunWithConfigValues(std::unique_ptr<SelectionStrategy> selectionStrategy, std::unique_ptr<CrossoverStrategy> crossoverStrategy)
+void GeneticAlgorithmService::RunWithConfigValues
+(std::unique_ptr<ISelectionStrategy> selectionStrategy,
+	std::unique_ptr<ICrossoverStrategy> crossoverStrategy)
 {
 	GeneticAlgorithm geneticAlgorithm(
 		UtilFunctions::CreateIndividualFunction(
@@ -19,7 +21,9 @@ void GeneticAlgorithmService::RunWithConfigValues(std::unique_ptr<SelectionStrat
 	geneticAlgorithm.Run();
 }
 
-void GeneticAlgorithmService::RunWithCustomFirstIndividual(std::unique_ptr<SelectionStrategy> selectionStrategy, std::unique_ptr<CrossoverStrategy> crossoverStrategy)
+void GeneticAlgorithmService::RunWithCustomFirstIndividual
+(std::unique_ptr<ISelectionStrategy> selectionStrategy,
+	std::unique_ptr<ICrossoverStrategy> crossoverStrategy)
 {
 	int oxSize = AlgorithmSettings::GetInstance()->GetOxSize();
 	int oySize = AlgorithmSettings::GetInstance()->GetOySize();

@@ -1,20 +1,23 @@
 #pragma once
+#pragma once
 
-#include <GeneticAlgorithm/GeneticAlgorithm.h>
-#include <GeneticAlgorithm/UtilFunctions.h>
+#include "Crossover/ICrossoverStrategy.h"
 
-#include <Services/AlgorithmSettings.h>
-#include <Services/CrossoverStrategy.h>
+#include "GeneticAlgorithm/GeneticAlgorithm.h"
+#include "GeneticAlgorithm/UtilFunctions.h"
+
+#include "Services/AlgorithmSettings.h"
 
 class GeneticAlgorithmService
 {
 public:
 	static void RunWithConfigValues(
-		std::unique_ptr<SelectionStrategy> selectionStrategy,
-		std::unique_ptr<CrossoverStrategy> crossoverStrategy);
+		std::unique_ptr<ISelectionStrategy> selectionStrategy,
+		std::unique_ptr<ICrossoverStrategy> crossoverStrategy);
+
 	static void RunWithCustomFirstIndividual(
-		std::unique_ptr<SelectionStrategy> selectionStrategy,
-		std::unique_ptr<CrossoverStrategy> crossoverStrategy);
+		std::unique_ptr<ISelectionStrategy> selectionStrategy,
+		std::unique_ptr<ICrossoverStrategy> crossoverStrategy);
 
 
 	static double CalculateSumOfFitnessValues(
@@ -28,5 +31,4 @@ public:
 	static std::vector<double> CalcutateCumulativeProbabilityOfSelection(
 		const std::vector<std::shared_ptr<IIndividual>>& workingPopulation,
 		const std::map<IIndividual*, double> fitnessValues);
-
 };

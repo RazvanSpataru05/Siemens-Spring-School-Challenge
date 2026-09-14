@@ -1,7 +1,12 @@
 #pragma once
-#include <Services/CrossoverStrategy.h>
 
-class Block3DCrossover : public CrossoverStrategy
+#include "Crossover/ICrossoverStrategy.h"
+
+#include "GeneticAlgorithm/Individual.h"
+
+#include "Services/RandomNumbersGenerator.h"
+
+class Block3DCrossover : public ICrossoverStrategy
 {
 public:
 	Block3DCrossover() = default;

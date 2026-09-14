@@ -2,12 +2,21 @@
 
 #include <string>
 
-const std::string FILE_NAME_INITIAL_INDIVIDUAL = std::string("../initial_individual.txt");
+// PROJECT_DATA_DIR is defined by CMake and points at the project directory.
+// Resolving the data files against it means the executable reads and writes the
+// same files no matter which working directory it is launched from.
+#ifndef PROJECT_DATA_DIR
+#define PROJECT_DATA_DIR ""
+#endif
 
-const std::string FILE_NAME_INDIVIDUAL = std::string("final_individual.txt");
-const std::string FILE_NAME_INDIVIDUAL_VALUES = std::string("individual_values.csv");
+const std::string DATA_DIR = std::string(PROJECT_DATA_DIR);
 
-const std::string FILE_NAME_ALGORITHM_SETTINGS = std::string("../algorithm_settings.txt");
+const std::string FILE_NAME_INITIAL_INDIVIDUAL = DATA_DIR + "initial_individual.txt";
+
+const std::string FILE_NAME_INDIVIDUAL = DATA_DIR + "final_individual.txt";
+const std::string FILE_NAME_INDIVIDUAL_VALUES = DATA_DIR + "individual_values.csv";
+
+const std::string FILE_NAME_ALGORITHM_SETTINGS = DATA_DIR + "algorithm_settings.txt";
 
 const int LOWER_BOUND = 0;
 const int UPPER_BOUND = 1;

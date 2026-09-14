@@ -1,10 +1,12 @@
 #pragma once
+
 #include <algorithm>
 
-#include <Services/SelectionStrategy.h>
-#include <Services/RandomNumbersGenerator.h>
+#include "Selection/ISelectionStrategy.h"
 
-class RankedSelection : public SelectionStrategy
+#include "Services/RandomNumbersGenerator.h"
+
+class RankedSelection : public ISelectionStrategy
 {
 public:
 	RankedSelection() = default;

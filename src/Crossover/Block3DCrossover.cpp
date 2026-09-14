@@ -1,6 +1,4 @@
-#include <Crossover/Block3DCrossover.h>
-#include <GeneticAlgorithm/Individual.h>
-#include <Services/RandomNumbersGenerator.h>
+#include "Crossover/Block3DCrossover.h"
 
 void Block3DCrossover::Crossover(IIndividual& first, IIndividual& second)
 {
@@ -16,7 +14,6 @@ void Block3DCrossover::Crossover(IIndividual& first, IIndividual& second)
 	std::vector<bool> newCubesExistence = firstIndividual.GetBuilding()->GetCubesExistence();
 	std::vector<bool> newOtherCubesExistence = secondIndividual.GetBuilding()->GetCubesExistence();
 
-	// random 3D bounding box
 	int minX = RandomNumbersGenerator::GenerateIntegerNumberInRange(0, m_sizeOx > 0 ? m_sizeOx - 1 : 0);
 	int maxX = RandomNumbersGenerator::GenerateIntegerNumberInRange(minX, m_sizeOx > 0 ? m_sizeOx - 1 : 0);
 	
@@ -35,8 +32,8 @@ void Block3DCrossover::Crossover(IIndividual& first, IIndividual& second)
 			continue;
 		}
 
-		int y = index / (m_sizeOx * m_sizeOz);
-		int remainder = index % (m_sizeOx * m_sizeOz);
+		int y = static_cast<int>(index) / (m_sizeOx * m_sizeOz);
+		int remainder = static_cast<int>(index) % (m_sizeOx * m_sizeOz);
 		int z = remainder / m_sizeOx;
 		int x = remainder % m_sizeOx;
 

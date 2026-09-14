@@ -1,7 +1,8 @@
 #pragma once
-#include <Services/CrossoverStrategy.h>
 
-class SymmetryForcedCrossover : public CrossoverStrategy
+#include "Crossover/ICrossoverStrategy.h"
+
+class SymmetryForcedCrossover : public ICrossoverStrategy
 {
 public:
 	SymmetryForcedCrossover() = default;

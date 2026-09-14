@@ -1,11 +1,11 @@
-#include <GeneticAlgorithm/GeneticAlgorithm.h>
+#include "GeneticAlgorithm/GeneticAlgorithm.h"
 
 GeneticAlgorithm::GeneticAlgorithm(
 	std::function<IIndividual* ()> createIndividual,
 	size_t populationSize, size_t numberOfEpochs,
 	double crossoverProbabillity, double mutationProbability,
-	std::unique_ptr<SelectionStrategy> selectionStrategy,
-	std::unique_ptr<CrossoverStrategy> crossoverStrategy) :
+	std::unique_ptr<ISelectionStrategy> selectionStrategy,
+	std::unique_ptr<ICrossoverStrategy> crossoverStrategy) :
 	m_createIndividual{ createIndividual },
 	m_populationSize{ populationSize },
 	m_numberOfEpochs{ numberOfEpochs },
@@ -19,10 +19,10 @@ GeneticAlgorithm::GeneticAlgorithm(
 GeneticAlgorithm::GeneticAlgorithm(
 	std::function<IIndividual* ()> createIndividual,
 	const GAConfig& config,
-	std::unique_ptr<SelectionStrategy> selectionStrategy) :
+	std::unique_ptr<ISelectionStrategy> selectionStrategy) :
 	m_createIndividual{ createIndividual },
-	m_populationSize{ static_cast<size_t>(config.population) },
-	m_numberOfEpochs{ static_cast<size_t>(config.epochs) },
+	m_populationSize{ config.population },
+	m_numberOfEpochs{ config.epochs },
 	m_crossoverProbability{ config.crossoverProbability },
 	m_mutationProbability{ config.mutationProbability },
 	m_selectionStrategy{ std::move(selectionStrategy) }
@@ -59,14 +59,14 @@ void GeneticAlgorithm::Run()
 	}
 }
 
-int GeneticAlgorithm::GetBestFitnessEpochIndex() const
+size_t GeneticAlgorithm::GetBestFitnessEpochIndex() const
 {
 	if (m_bestFitnessPerEpoch.empty()) return 0;
 
-	int bestIndex{};
-	double bestFitness = m_bestFitnessPerEpoch[0];
+	size_t bestIndex{};
+	double bestFitness{};
 
-	for (size_t index = 1; index < m_bestFitnessPerEpoch.size(); ++index)
+	for (size_t index = 0; index < m_bestFitnessPerEpoch.size(); ++index)
 	{
 		if (m_bestFitnessPerEpoch[index] > bestFitness)
 		{
@@ -82,7 +82,7 @@ IIndividual* GeneticAlgorithm::GetWinnerIndividual()
 	double maxValue{};
 	IIndividual* winner = nullptr;
 
-	for (const auto value : m_fitnessValues)
+	for (const auto& value : m_fitnessValues)
 	{
 		if (value.second > maxValue)
 		{

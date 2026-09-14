@@ -25,8 +25,6 @@ void Application::Run()
 	{
 		m_scene.Shutdown();
 		m_scene.SetOnStartGA({});
-		// Open the viewer already sitting on the best-scoring epoch, which is not
-		// necessarily the last one -- there is no elitism to carry it forward.
 		m_scene.ShowEpochResults(m_result.epochGenes,
 			m_result.bestFitnessEpochIndex, m_result.bestFitnessEpochIndex);
 	}

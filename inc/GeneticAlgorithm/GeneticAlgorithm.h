@@ -8,20 +8,21 @@
 #include <thread>
 #include <unordered_set>
 
-#include <GeneticAlgorithm/IIndividual.h>
+#include "GeneticAlgorithm/IIndividual.h"
 
-#include <Services/SelectionStrategy.h>
-#include <Services/CrossoverStrategy.h>
-#include <Services/RandomNumbersGenerator.h>
-#include <Services/IOIndividualManager.h>
-#include <Services/GeneticAlgorithmService.h>
-#include <Services/GAConfig.h>
-#include <Services/constants.h>
+#include "Selection/ISelectionStrategy.h"
 
-#include <Crossover/SinglePointCrossover.h>
-#include <Crossover/Block3DCrossover.h>
-#include <Crossover/Planar2PointCrossover.h>
-#include <Crossover/SymmetryForcedCrossover.h>
+#include "Services/RandomNumbersGenerator.h"
+#include "Services/IOIndividualManager.h"
+#include "Services/GeneticAlgorithmService.h"
+#include "Services/GAConfig.h"
+#include "Services/constants.h"
+
+#include "Crossover/ICrossoverStrategy.h"
+#include "Crossover/SinglePointCrossover.h"
+#include "Crossover/Block3DCrossover.h"
+#include "Crossover/Planar2PointCrossover.h"
+#include "Crossover/SymmetryForcedCrossover.h"
 
 class GeneticAlgorithm
 {
@@ -32,13 +33,13 @@ public:
 		size_t numberOfEpochs,
 		double crossoverProbabillity,
 		double mutationProbability,
-		std::unique_ptr<SelectionStrategy> selectionStrategy,
-		std::unique_ptr<CrossoverStrategy> crossoverStrategy);
+		std::unique_ptr<ISelectionStrategy> selectionStrategy,
+		std::unique_ptr<ICrossoverStrategy> crossoverStrategy);
 
 	GeneticAlgorithm(
 		std::function<IIndividual* ()> createIndividual,
 		const GAConfig& config,
-		std::unique_ptr<SelectionStrategy> selectionStrategy);
+		std::unique_ptr<ISelectionStrategy> selectionStrategy);
 
 	GeneticAlgorithm(const GeneticAlgorithm& other) = delete;
 	GeneticAlgorithm(GeneticAlgorithm&& other) = delete;
@@ -56,7 +57,7 @@ public:
 	[[nodiscard]] const std::vector<double>& GetBestStressPerEpoch() const;
 	[[nodiscard]] const std::vector<double>& GetBestFitnessPerEpoch() const;
 	
-	[[nodiscard]] int GetBestFitnessEpochIndex() const;
+	[[nodiscard]] size_t GetBestFitnessEpochIndex() const;
 
 private:
 	void InitializePopulation();
@@ -77,8 +78,8 @@ private:
 	std::vector<double> m_bestStressPerEpoch;
 	std::vector<double> m_bestFitnessPerEpoch;
 
-	std::unique_ptr<SelectionStrategy> m_selectionStrategy;
-	std::unique_ptr<CrossoverStrategy> m_crossoverStrategy;
+	std::unique_ptr<ISelectionStrategy> m_selectionStrategy;
+	std::unique_ptr<ICrossoverStrategy> m_crossoverStrategy;
 
 	std::function<IIndividual* ()> m_createIndividual;
 

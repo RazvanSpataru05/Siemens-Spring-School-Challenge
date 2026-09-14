@@ -5,8 +5,8 @@
 
 #include <Services/StyleService.h>
 #include <Services/GAConfig.h>
-#include <Services/SelectionStrategy.h>
 
+#include <Selection/ISelectionStrategy.h>
 #include <Selection/RankedSelection.h>
 #include <Selection/RouletteWheelSelection.h>
 #include <Selection/StochasticUniversalSamplingSelection.h>

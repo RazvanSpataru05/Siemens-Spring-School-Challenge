@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Services/SelectionStrategy.h>
-#include <Services/RandomNumbersGenerator.h>
-#include <Services/GeneticAlgorithmService.h>
+#include "Selection/ISelectionStrategy.h"
 
-class StochasticUniversalSamplingSelection : public SelectionStrategy
+#include "Services/RandomNumbersGenerator.h"
+#include "Services/GeneticAlgorithmService.h"
+
+class StochasticUniversalSamplingSelection : public ISelectionStrategy
 {
 public:
 	StochasticUniversalSamplingSelection() = default;

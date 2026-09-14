@@ -1,7 +1,8 @@
 #pragma once
-#include <Services/CrossoverStrategy.h>
 
-class SinglePointCrossover : public CrossoverStrategy
+#include "Crossover/ICrossoverStrategy.h"
+
+class SinglePointCrossover : public ICrossoverStrategy
 {
 public:
 	SinglePointCrossover() = default;
