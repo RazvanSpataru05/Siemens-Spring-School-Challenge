@@ -1,10 +1,4 @@
-#include <Scene.h>
-#include <System/ConfigureSystem.h>
-
-#include <GeneticAlgorithm/Individual.h>
-#include <Services/AlgorithmSettings.h>
-
-Scene::Scene() {}
+#include "System/Scene.h"
 
 void Scene::SetOnStartGA(std::function<void(const GAConfig&)> callback)
 {
@@ -44,10 +38,15 @@ void Scene::InitializeSystem(const std::shared_ptr<Building>& building, bool epo
 	}
 	m_configureSystem->ConfigureIrrllichtScene();
 
-	if (m_epochViewerMode) LoadBuildingIntoHost(m_epochGenes[m_currentEpochIndex]);
-
-	else m_configureSystem->InitializeIrrlichtScene();
-
+	if (m_epochViewerMode)
+	{
+		LoadBuildingIntoHost(m_epochGenes[m_currentEpochIndex]);
+	}
+	else
+	{
+		m_configureSystem->InitializeIrrlichtScene();
+	}
+		
 	m_configureSystem->SetIrrlichtSceneTimestep(0.001);
 	m_configureSystem->SetSystemTimestepper();
 	m_configureSystem->SetSystemSolver();
@@ -113,7 +112,7 @@ void Scene::LoadBuildingIntoHost(const std::vector<bool>& cubesExistence)
 
 	m_system->Clear();
 
-	auto sourceSystem = displayBuilding->GetSystem();
+	auto& sourceSystem = displayBuilding->GetSystem();
 	m_system->Add(displayBuilding->GetMesh());
 
 	for (const auto& body : sourceSystem->Get_bodylist())

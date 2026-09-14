@@ -2,9 +2,6 @@
 
 #include <string>
 
-// PROJECT_DATA_DIR is defined by CMake and points at the project directory.
-// Resolving the data files against it means the executable reads and writes the
-// same files no matter which working directory it is launched from.
 #ifndef PROJECT_DATA_DIR
 #define PROJECT_DATA_DIR ""
 #endif

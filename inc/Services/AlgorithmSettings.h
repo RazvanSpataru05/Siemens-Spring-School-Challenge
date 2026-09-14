@@ -5,27 +5,27 @@
 #include <algorithm>
 #include <memory>
 
-#include <Selection/ISelectionStrategy.h>
-#include <Services/constants.h>
+#include "Selection/ISelectionStrategy.h"
+#include "Services/Constants.h"
 
 class AlgorithmSettings
 {
 public:
 	static AlgorithmSettings* GetInstance();
 
-	const int GetNumberOfEpochs() const;
-	const int GetNumberOfIndividuals() const;
-	const int GetOxSize() const;
-	const int GetOySize() const;
-	const int GetOzSize() const;
-	const double GetElementSize() const;
-	const double GetCrossoverProbability() const;
-	const double GetMutationProbability() const;
+	[[nodiscard]] const int GetNumberOfEpochs() const;
+	[[nodiscard]] const int GetNumberOfIndividuals() const;
+	[[nodiscard]] const int GetOxSize() const;
+	[[nodiscard]] const int GetOySize() const;
+	[[nodiscard]] const int GetOzSize() const;
+	[[nodiscard]] const double GetElementSize() const;
+	[[nodiscard]] const double GetCrossoverProbability() const;
+	[[nodiscard]] const double GetMutationProbability() const;
 
-	const double GetMaximStressAllowed() const;
-	const double GetYoungModulus() const;
-	const double GetPoissonRatio() const;
-	const double GetDensity() const;
+	[[nodiscard]] const double GetMaximStressAllowed() const;
+	[[nodiscard]] const double GetYoungModulus() const;
+	[[nodiscard]] const double GetPoissonRatio() const;
+	[[nodiscard]] const double GetDensity() const;
 
 private:
 

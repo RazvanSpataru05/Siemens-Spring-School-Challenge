@@ -42,7 +42,7 @@ void GeneticAlgorithm::Run()
 
 	for (size_t index = 0; index < m_numberOfEpochs; ++index)
 	{
-		std::cout << std::endl << "Epoch: " << index + 1 << std::endl;
+		std::cout << std::endl << "Epoch: " << index + 1 << "/" << m_numberOfEpochs << std::endl;
 
 		CalculateFitnessValues();
 
@@ -50,12 +50,12 @@ void GeneticAlgorithm::Run()
 		Crossover();
 		Mutation();
 
-		WriteWinners(index);
+		WriteWinners(static_cast<int>(index));
 		IIndividual* bestIndividual = GetWinnerIndividual();
-		m_bestRemovedPerEpoch.push_back(dynamic_cast<Individual&>(*bestIndividual).GetNumberOfRemovedElementsWithoutInitialGene());
-		m_bestStressPerEpoch.push_back(dynamic_cast<Individual&>(*bestIndividual).GetCurrentMaxStress());
-		m_bestFitnessPerEpoch.push_back(m_fitnessValues[bestIndividual]);
-		m_bestEpochIndividual.push_back(dynamic_cast<Individual&>(*bestIndividual).GetBuilding()->GetCubesExistence());
+		m_bestRemovedPerEpoch.emplace_back(dynamic_cast<Individual&>(*bestIndividual).GetNumberOfRemovedElementsWithoutInitialGene());
+		m_bestStressPerEpoch.emplace_back(dynamic_cast<Individual&>(*bestIndividual).GetCurrentMaxStress());
+		m_bestFitnessPerEpoch.emplace_back(m_fitnessValues[bestIndividual]);
+		m_bestEpochIndividual.emplace_back(dynamic_cast<Individual&>(*bestIndividual).GetBuilding()->GetCubesExistence());
 	}
 }
 
@@ -119,8 +119,8 @@ void GeneticAlgorithm::InitializePopulation()
 	{
 		std::cout << "Created individual " << index + 1 << "\n";
 
-		m_population.push_back(std::move(std::shared_ptr<IIndividual>(m_createIndividual())));
-		m_workingPopulation.push_back(m_population[index]);
+		m_population.emplace_back(std::move(std::shared_ptr<IIndividual>(m_createIndividual())));
+		m_workingPopulation.emplace_back(m_population[index]);
 	}
 }
 
@@ -134,7 +134,7 @@ void GeneticAlgorithm::CalculateFitnessValues()
 	{
 		if (alreadyQueued.insert(individual.get()).second)
 		{
-			distinctIndividuals.push_back(individual);
+			distinctIndividuals.emplace_back(individual);
 		}
 	}
 
@@ -175,7 +175,7 @@ void GeneticAlgorithm::Crossover()
 	{
 		if (randomNumbers[index] < m_crossoverProbability)
 		{
-			selectedPopulationForCrossover.push_back(m_workingPopulation[index]);
+			selectedPopulationForCrossover.emplace_back(m_workingPopulation[index]);
 		}
 	}
 

@@ -1,19 +1,24 @@
 #pragma once
 
-#include <Services/GAConfig.h>
-
 #include <chrono/fea/ChLinkPointFrame.h>
 #include <chrono/physics/ChSystemSMC.h>
 #include <chrono_irrlicht/ChIrrApp.h>
 
-#include <GraphicalObjects/Building.h>
+#include "Services/GAConfig.h"
+#include "Services/AlgorithmSettings.h"
+
+#include "GeneticAlgorithm/Individual.h"
+
+#include "GraphicalObjects/Building.h"
+
+#include "System/ConfigureSystem.h"
 
 class ConfigureSystem;
 
 class Scene
 {
 public:
-	Scene();
+	Scene() = default;
 	~Scene() = default;
 
 	void SetOnStartGA(std::function<void(const GAConfig&)> callback);

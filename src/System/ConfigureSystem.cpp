@@ -1,4 +1,4 @@
-#include <System/ConfigureSystem.h>
+#include "System/ConfigureSystem.h"
 
 const irr::core::vector3df ConfigureSystem::K_INITIAL_POSITION(0.60f, 0.17f, -1.25f);
 
@@ -132,8 +132,8 @@ void ConfigureSystem::RunIrrlichtScene()
 			static int population = 50;
 			ImGui::SliderInt("Population", &population, 50, 1000);
 
-			static float crossoverProbability = 0.2f;
-			ImGui::SliderFloat("Crossover Probability", &crossoverProbability, 0.2f, 0.6f, "%.2f");
+			static float crossoverProbability = 0.1f;
+			ImGui::SliderFloat("Crossover Probability", &crossoverProbability, 0.1f, 0.6f, "%.2f");
 
 			static float mutationProbability = 0.01f;
 			ImGui::SliderFloat("Mutation Probability", &mutationProbability, 0.01f, 0.20f, "%.2f");
@@ -208,7 +208,8 @@ void ConfigureSystem::ManageKeyStrokes()
 	}
 }
 
-void ConfigureSystem::SetEpochStats(std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness)
+void ConfigureSystem::SetEpochStats(
+	std::vector<int> removed, std::vector<double> stress, std::vector<double> fitness)
 {
 	m_removedElementsPerEpoch = std::move(removed);
 	m_maxStresPerEpoch = std::move(stress);

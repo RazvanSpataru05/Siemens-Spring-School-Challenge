@@ -1,10 +1,7 @@
-#include <Services/RandomNumbersGenerator.h>
+#include "Services/RandomNumbersGenerator.h"
 
 namespace
 {
-	// Seeding a mt19937 costs far more than drawing from it, and this is called once per
-	// gene per individual per epoch. One engine per thread keeps the draws independent
-	// across the parallel fitness evaluations without paying that cost every time.
 	std::mt19937& Engine()
 	{
 		static thread_local std::mt19937 generator{ std::random_device{}() };
@@ -36,7 +33,7 @@ std::vector<double> RandomNumbersGenerator::GenerateRealNumbers(int lowerBound, 
 
 	for (size_t index = 0; index < size; ++index)
 	{
-		randomNumbers.push_back(distribution(generator));
+		randomNumbers.emplace_back(distribution(generator));
 	}
 
 	return randomNumbers;
